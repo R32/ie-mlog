@@ -1,0 +1,82 @@
+#mlog {
+	var text-blue = #0366d6;
+	var background-color = #efefef;
+	var font-color = #2f363d;
+	var font-size = 16px;
+	var font-size-small = int($font-size * .75);
+	var mono-font = consolas, monospace;
+	var font-text = Arial, sans-serif;
+	var label-font = "Microsoft YaHei"; /* "Segoe UI" */
+	var pad4 = int($font-size * 0.25);
+	position:fixed;
+	display:block;
+	left:10%;
+	right: 10%;
+	bottom: 0;
+	min-width: 600px;
+	border:#999999 1px solid;
+	color: $font-color;
+	> input[type=text] {
+		display: block;
+		width: 100%;
+		box-sizing: border-box;
+		padding: $pad4 0;
+		font-family: $font-text;
+		color: inherit;
+		font-size: $font-size;
+	}
+	> div {
+		height: $font-size * 12;
+		font-family: $mono-font;
+		background-color: $background-color;
+		white-space: pre;
+		overflow-y:auto;
+		font-size: $font-size - 2;
+		list-style: none;
+		> pre {
+			margin: 0;
+			font-family: $mono-font;
+			color: $text-blue;
+		}
+		> li {
+			margin: 0;
+			padding: 0;
+			border: 1px $background-color solid;
+			ul {
+				list-style: none;
+				margin: 0;
+				padding: 0;
+				li {
+					padding-left: int($font-size * 1.25);
+				}
+			}
+			a {
+				cursor: pointer;
+				color: $text-blue;
+				text-decoration: none;
+			}
+			&.err {
+				color: #f00;
+				background-color: #ffeded;
+				border-top-color: #da9393;
+				border-bottom-color: #da9393;
+			}
+		}
+		span.ct {
+			vertical-align: top;
+			padding: 1px 4px;
+			margin-left: $pad4 * 0.5;
+			background-color: #998fc7;
+			color: #fff;
+			font-size: $font-size-small;
+		}
+		span.pos {
+			var margin = int(($font-size - $font-size-small) * 0.5);
+			color: #666;
+			float: right;
+			text-align: right;
+			padding: 1px $pad4 * .5 0 0;
+			font-size: $font-size-small;
+		}
+	}
+}
