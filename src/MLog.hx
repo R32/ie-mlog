@@ -105,10 +105,12 @@ $$("s")  : document.querySelectorAll("s")
 		}
 	}
 	function s_object(o : haxe.DynamicAccess<Dynamic>, rec : Bool) {
-		if(!rec)
+		if (!rec)
 			return PUSH("[" + "object" + "]");
 		var max = 0;
 		var keys = o.keys();
+		if (keys.length == 0 && js.lib.Object.prototype.toString.call(o) != "[object Object]")
+			return PUSH("" + o);
 		(cast keys).sort(); // the origin sort of js
 		for (k in keys)
 			if (k.length > max)
@@ -122,7 +124,7 @@ $$("s")  : document.querySelectorAll("s")
 		if (size <= 80) {
 			for (i in 0...keys.length)
 				lines[i] = keys[i] + ": " + lines[i];
-			lines = ['{ ${lines.join(", ")} }'];
+			lines = ['{${lines.join(", ")}}'];
 		} else {
 			for (i in 0...keys.length)
 				lines[i] = StringTools.rpad(keys[i], " ", max + 1) + lines[i];
@@ -131,6 +133,8 @@ $$("s")  : document.querySelectorAll("s")
 
 	var prev : Dynamic;
 	var prevCount : Int;
+
+	inline function clearPrev() prev = null;
 
 	function simple() {
 		if (lines[0] != prev || output.firstChild == null) {
@@ -154,8 +158,7 @@ $$("s")  : document.querySelectorAll("s")
 	}
 
 	function multiple(expr : String) {
-		prev = null;
-		prevCount = 1;
+		clearPrev();
 		var frag = document.createDocumentFragment();
 		for (s in lines)
 			frag.appendChild(HXX(<li>{{ s }}</li>));
@@ -171,10 +174,6 @@ $$("s")  : document.querySelectorAll("s")
 			simple();
 		else
 			multiple(expr);
-	}
-
-	function errInner(v : Dynamic) {
-		OUT(HXX(<li class="err">{{v}}</li>));
 	}
 
 	static function attach(obj: js.html.EventTarget, type: String, handler : haxe.Constraints.Function) {
@@ -236,7 +235,7 @@ $$("s")  : document.querySelectorAll("s")
 			} else if (value == "cls") {
 				mlog.clearOutput();
 			} else {
-				return mlog.errInner(e);
+				return mlog.OUT(HXX(<li class="err">{{e}}</li>));
 			}
 			mlog.clearInput();
 		}

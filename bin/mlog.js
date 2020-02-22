@@ -122,7 +122,7 @@ MLog.onInputKeydown = function(e) {
 			_this.prev = null;
 			_this.prevCount = 1;
 		} else {
-			MLog.mlog.errInner(e2);
+			MLog.mlog.root.children[1].appendChild(dt.h("li",{ 'class' : "err"},e2));
 			return;
 		}
 		MLog.mlog.root.children[0].value = "";
@@ -167,7 +167,7 @@ MLog.prototype = {
 		this.root.children[1].textContent = "";
 		this.prev = null;
 		this.prevCount = 1;
-		this.root.children[1].appendChild(dt.h("pre",null,"Mini log[ver:" + "master 880e1b2" + "] for IWebBrowser(Embeded IE)\r\ncls      : clear output\r\n$(\"s\")   : document.querySelector(\"s\")\r\n$$(\"s\")  : document.querySelectorAll(\"s\")\r\n"));
+		this.root.children[1].appendChild(dt.h("pre",null,"Mini log[ver:" + "master ac0f6df" + "] for IWebBrowser(Embeded IE)\r\ncls      : clear output\r\n$(\"s\")   : document.querySelector(\"s\")\r\n$$(\"s\")  : document.querySelectorAll(\"s\")\r\n"));
 	}
 	,parse: function(v,first) {
 		switch(typeof(v)) {
@@ -224,6 +224,10 @@ MLog.prototype = {
 		}
 		var max = 0;
 		var keys = Reflect.fields(o);
+		if(keys.length == 0 && Object.prototype.toString.call(o) != "[object Object]") {
+			this.lines.push("" + Std.string(o));
+			return;
+		}
 		keys.sort();
 		var _g = 0;
 		while(_g < keys.length) {
@@ -249,7 +253,7 @@ MLog.prototype = {
 				var i1 = _g3++;
 				this.lines[i1] = keys[i1] + ": " + this.lines[i1];
 			}
-			this.lines = ["{ " + this.lines.join(", ") + " }"];
+			this.lines = ["{" + this.lines.join(", ") + "}"];
 		} else {
 			var _g31 = 0;
 			var _g41 = keys.length;
@@ -281,7 +285,6 @@ MLog.prototype = {
 	}
 	,multiple: function(expr) {
 		this.prev = null;
-		this.prevCount = 1;
 		var frag = window.document.createDocumentFragment();
 		var _g = 0;
 		var _g1 = this.lines;
@@ -298,9 +301,6 @@ MLog.prototype = {
 		} else {
 			this.multiple(expr);
 		}
-	}
-	,errInner: function(v) {
-		this.root.children[1].appendChild(dt.h("li",{ 'class' : "err"},v));
 	}
 };
 var Reflect = function() { };
