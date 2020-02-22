@@ -220,8 +220,22 @@ MLog.onInputKeydown = function(e) {
 		MLog.mlog.root.children[0].value = "";
 	}
 };
+MLog.objLabel = function(o) {
+	var ctor = o.constructor;
+	if(ctor == null) {
+		return Object.prototype.toString.call(o);
+	}
+	if(ctor.name != null) {
+		return ctor.name;
+	}
+	var s = ctor.toString();
+	if(s.charCodeAt(0) == 91) {
+		return s;
+	}
+	return "[" + "object" + "]";
+};
 MLog.log = function(v,infos) {
-	var label = Object.prototype.toString.call(v);
+	var label = MLog.objLabel(v);
 	if(infos == null) {
 		var node = MLog.mlog.logInner(label,v);
 		if(node != null) {
@@ -271,7 +285,7 @@ MLog.prototype = {
 		this.root.children[1].textContent = "";
 		this.prev = null;
 		this.prevCount = 1;
-		this.root.children[1].appendChild(dt.h("pre",null,"Mini log[ver:" + "master 4a6d600" + "] for IWebBrowser(Embeded IE)\r\ncls      : clear output\r\n$(\"s\")   : document.querySelector(\"s\")\r\n$$(\"s\")  : document.querySelectorAll(\"s\")\r\n"));
+		this.root.children[1].appendChild(dt.h("pre",null,"Mini log[ver:" + "master ffc26bd" + "] for IWebBrowser(Embeded IE)\r\ncls      : clear output\r\n$(\"s\")   : document.querySelector(\"s\")\r\n$$(\"s\")  : document.querySelectorAll(\"s\")\r\n"));
 	}
 	,parse: function(v,first) {
 		switch(typeof(v)) {
@@ -323,52 +337,49 @@ MLog.prototype = {
 	}
 	,s_object: function(o,rec) {
 		if(!rec) {
-			this.lines.push("[" + "object" + "]");
+			var s = MLog.objLabel(o);
+			this.lines.push(s);
 			return;
 		}
 		var keys = Reflect.fields(o);
 		if(keys.length == 0 && Object.prototype.toString.call(o) != "[object Object]") {
-			this.lines.push("" + Std.string(o));
+			var s1 = String(o);
+			this.lines.push(s1);
 			return;
 		}
-		var max = 0;
 		keys.sort();
-		var _g = 0;
-		while(_g < keys.length) {
-			var k = keys[_g];
-			++_g;
-			if(k.length > max) {
-				max = k.length;
-			}
-		}
 		var size = 0;
-		var _g1 = 0;
-		var _g2 = keys.length;
-		while(_g1 < _g2) {
-			var i = _g1++;
-			var k1 = keys[i];
+		var max = 0;
+		var _g = 0;
+		var _g1 = keys.length;
+		while(_g < _g1) {
+			var i = _g++;
+			var k = keys[i];
 			var v;
 			try {
-				v = o[k1];
+				v = o[k];
 			} catch( e ) {
 				v = ((e) instanceof js__$Boot_HaxeError) ? e.val : e;
 			}
 			this.parse(v,false);
-			size += k1.length + this.lines[i].length;
+			size += k.length + this.lines[i].length;
+			if(k.length > max) {
+				max = k.length;
+			}
 		}
 		if(size <= 80) {
-			var _g3 = 0;
-			var _g4 = keys.length;
-			while(_g3 < _g4) {
-				var i1 = _g3++;
+			var _g2 = 0;
+			var _g3 = keys.length;
+			while(_g2 < _g3) {
+				var i1 = _g2++;
 				this.lines[i1] = keys[i1] + ": " + this.lines[i1];
 			}
 			this.lines = ["{" + this.lines.join(", ") + "}"];
 		} else {
-			var _g31 = 0;
-			var _g41 = keys.length;
-			while(_g31 < _g41) {
-				var i2 = _g31++;
+			var _g21 = 0;
+			var _g31 = keys.length;
+			while(_g21 < _g31) {
+				var i2 = _g21++;
 				this.lines[i2] = StringTools.rpad(keys[i2]," ",max + 1) + this.lines[i2];
 			}
 		}

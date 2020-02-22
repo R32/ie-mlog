@@ -107,10 +107,10 @@ $$("s")  : document.querySelectorAll("s")
 	}
 	function s_object(o : haxe.DynamicAccess<Dynamic>, rec : Bool) {
 		if (!rec)
-			return PUSH("[" + "object" + "]");
+			return PUSH(objLabel(o));
 		var keys = o.keys();
 		if (keys.length == 0 && js.lib.Object.prototype.toString.call(o) != "[object Object]")
-			return PUSH("" + o);
+			return PUSH((cast String)(o)); // Date, RegExp
 		(cast keys).sort(); // the origin sort of js
 		var size = 0;
 		var max = 0;
@@ -249,8 +249,20 @@ $$("s")  : document.querySelectorAll("s")
 		}
 	}
 
+	static function objLabel(o : Dynamic) : String {
+		var ctor = o.constructor;
+		if (ctor == null)
+			return js.lib.Object.prototype.toString.call(o);
+		if (ctor.name != null)
+			return ctor.name;
+		var s = ctor.toString();
+		if (StringTools.fastCodeAt(s, 0) == "[".code)
+			return s;
+		return "[" + "object" +"]";
+	}
+
 	static function log(v:Dynamic, ?infos:haxe.PosInfos) {
-		var label = js.lib.Object.prototype.toString.call(v);
+		var label = objLabel(v);
 		if (infos == null) {
 			var node = mlog.logInner(label, v);
 			if (node != null)
