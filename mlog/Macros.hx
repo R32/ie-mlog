@@ -1,4 +1,4 @@
-package;
+package mlog;
 
 #if macro
 using haxe.io.Path;

@@ -15,16 +15,16 @@
   </output>
   <!-- Other classes to be compiled into your SWF -->
   <classpaths>
-    <class path="src" />
+    <class path="." />
   </classpaths>
   <!-- Build options -->
   <build>
     <option directives="analyzer-optimize&#xA;js-es=3&#xA;js-classic" />
     <option flashStrict="True" />
     <option noInlineOnDebug="False" />
-    <option mainClass="MLog" />
+    <option mainClass="mlog.MLog" />
     <option enabledebug="True" />
-    <option additional="-dce full&#xA;--macro includeFile('src/polyfill.js')" />
+    <option additional="-dce full&#xA;--macro includeFile('mlog/polyfill.js')" />
   </build>
   <!-- haxelib libraries -->
   <haxelib>

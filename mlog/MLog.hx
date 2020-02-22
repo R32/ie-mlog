@@ -1,4 +1,4 @@
-package;
+package mlog;
 
 import Nvd.HXX;
 import js.html.DOMElement;
@@ -8,6 +8,7 @@ import js.Browser.document;
 /**
  Press "shift + F12" to lanuch.
 */
+@:native("MLog")
 class MLog {
 
 	var root : DOMElement;
@@ -251,7 +252,7 @@ $$("s")  : document.querySelectorAll("s")
 		}
 	}
 
-	static function log(v:Dynamic, ?infos:haxe.PosInfos) {
+	public static function log(v:Dynamic, ?infos:haxe.PosInfos) {
 		var node = HXX(<li>{{v}}</li>);
 		if (infos != null)
 			node.appendChild(HXX(<span class="pos">{{ infos.fileName }}:{{ infos.lineNumber }}</span>));
@@ -260,7 +261,7 @@ $$("s")  : document.querySelectorAll("s")
 
 	// don't do inline here since https://github.com/HaxeFoundation/haxe/issues/6197
 	@:analyzer(no_const_propagation) static function injectCSS() {
-		var css = Macros.buildHSS("src/style.hss");
+		var css = Macros.buildHSS("mlog/style.hss");
 		one("head").appendChild( HXX(<style type="text/css">{{css}}</style>) );
 	}
 
