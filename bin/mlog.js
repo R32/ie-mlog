@@ -169,7 +169,7 @@ MLog.prototype = {
 		this.root.children[1].textContent = "";
 		this.prev = null;
 		this.prevCount = 1;
-		this.root.children[1].appendChild(dt.h("pre",null,"Mini log[ver:" + "master ac0f6df" + "] for IWebBrowser(Embeded IE)\r\ncls      : clear output\r\n$(\"s\")   : document.querySelector(\"s\")\r\n$$(\"s\")  : document.querySelectorAll(\"s\")\r\n"));
+		this.root.children[1].appendChild(dt.h("pre",null,"Mini log[ver:" + "master 529ea9b" + "] for IWebBrowser(Embeded IE)\r\ncls      : clear output\r\n$(\"s\")   : document.querySelector(\"s\")\r\n$$(\"s\")  : document.querySelectorAll(\"s\")\r\n"));
 	}
 	,parse: function(v,first) {
 		switch(typeof(v)) {
@@ -224,12 +224,12 @@ MLog.prototype = {
 			this.lines.push("[" + "object" + "]");
 			return;
 		}
-		var max = 0;
 		var keys = Reflect.fields(o);
 		if(keys.length == 0 && Object.prototype.toString.call(o) != "[object Object]") {
 			this.lines.push("" + Std.string(o));
 			return;
 		}
+		var max = 0;
 		keys.sort();
 		var _g = 0;
 		while(_g < keys.length) {
@@ -245,7 +245,13 @@ MLog.prototype = {
 		while(_g1 < _g2) {
 			var i = _g1++;
 			var k1 = keys[i];
-			this.parse(o[k1],false);
+			var v;
+			try {
+				v = o[k1];
+			} catch( e ) {
+				v = ((e) instanceof js__$Boot_HaxeError) ? e.val : e;
+			}
+			this.parse(v,false);
 			size += k1.length + this.lines[i].length;
 		}
 		if(size <= 80) {
