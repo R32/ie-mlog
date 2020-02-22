@@ -111,17 +111,16 @@ $$("s")  : document.querySelectorAll("s")
 		var keys = o.keys();
 		if (keys.length == 0 && js.lib.Object.prototype.toString.call(o) != "[object Object]")
 			return PUSH("" + o);
-		var max = 0;
 		(cast keys).sort(); // the origin sort of js
-		for (k in keys)
-			if (k.length > max)
-				max = k.length;
 		var size = 0;
+		var max = 0;
 		for (i in 0...keys.length) {
 			var k = keys[i];
 			var v = try o[k] catch(e:Dynamic) e; // access may denied
 			parse(v, false);
 			size += k.length + (lines[i]).length;
+			if (k.length > max)
+				max = k.length;
 		}
 		if (size <= 80) {
 			for (i in 0...keys.length)
