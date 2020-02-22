@@ -42,13 +42,9 @@
 			margin: 0;
 			padding: 0;
 			border: 1px $background-color solid;
-			ul {
-				list-style: none;
+			pre {
 				margin: 0;
-				padding: 0;
-				li {
-					padding-left: int($font-size * 1.25);
-				}
+				padding-left : int($font-size * 1.25);
 			}
 			a {
 				cursor: pointer;

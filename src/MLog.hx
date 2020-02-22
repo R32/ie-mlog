@@ -159,17 +159,23 @@ $$("s")  : document.querySelectorAll("s")
 
 	function multiple(expr : String) {
 		clearPrev();
-		var frag = document.createDocumentFragment();
-		for (s in lines)
-			frag.appendChild(HXX(<li>{{ s }}</li>));
-		var li = HXX(<li><a>{{expr}}</a> <ul/></li>);
-		li.querySelector("ul").appendChild(frag);
+		var li = HXX(<li>
+			<a>{{ expr }}</a>
+			<pre>{{ lines.join("\n") }}</pre>
+		</li>);
 		OUT(li);
 	}
 
 	function logInner(expr : String, v : Dynamic) {
 		this.lines = [];
 		parse(v, true);
+		//
+		var li : DOMElement = cast output.lastChild;
+		if (li != null && li.nodeName == "LI") {
+			var a = li.firstChild;
+			if (a != null && a.nodeName == "A" && (cast a).style.textDecoration != "underline")
+				toggleBlock(cast a);
+		}
 		if (this.isSingle())
 			simple();
 		else
@@ -198,15 +204,11 @@ $$("s")  : document.querySelectorAll("s")
 		}
 	}
 
-	static function onLinkClick(e : js.html.MouseEvent){
-		e.stopPropagation();
-		var a : DOMElement = cast e.target;
-		if (a.nodeName != "A")
-			return;
+	static function toggleBlock(a : DOMElement){
 		var ul:Dynamic = a.nextSibling;
 		while (ul.nodeType != TElement)
 			ul = ul.nextSibling;
-		// IE8 doesn't support the changes on css sibling.
+		// IE8 doesn't support the changes on css sibling(e.g: a.hidden + ul {display:none} ).
 		if (ul.style.display == "none") {
 			ul.style.display = "block";
 			a.style.textDecoration = "none";
@@ -214,6 +216,13 @@ $$("s")  : document.querySelectorAll("s")
 			ul.style.display = "none";
 			a.style.textDecoration = "underline";
 		}
+	}
+
+	static function onLinkClick(e : js.html.MouseEvent){
+		e.stopPropagation();
+		var a : DOMElement = cast e.target;
+		if (a.nodeName == "A")
+			toggleBlock(a);
 	}
 
 	static function onContextMenu(e : js.html.MouseEvent) {
