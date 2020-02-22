@@ -1,4 +1,22 @@
 /*!
+ for haxe
+*/
+if (window.console == null) {
+	window.console = {
+		log: function() {
+			var slice = Array.prototype.slice;
+			var args = slice.call(arguments, 0);
+			var pinfo = null;
+			var p = args[0].split(":");
+			if (p.length >= 3) {
+				args = slice.call(args, 1);
+				pinfo = {fileName: p[0], lineNumber: p[1] | 0};
+			}
+			MLog.log(args.length == 1 ? args[0] : args, pinfo);
+		}
+	}
+}
+/*!
 Event.prototype.target, preventDefault, stopPropagation.(no currentTarget)
 */
 if (Object.defineProperty

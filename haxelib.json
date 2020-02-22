@@ -1,0 +1,10 @@
+{
+    "name": "ie-mlog",
+    "url": "https://github.com/r32/ie-mlog",
+    "description": "console.log for IWebBrowser(Embeded IE)",
+    "license": "BSD",
+    "version": "0.1.0",
+    "releasenote": "init",
+    "contributors": ["r32"],
+    "tags": ["IWebBrowser", "console"]
+}

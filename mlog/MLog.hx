@@ -142,8 +142,7 @@ $$("s")  : document.querySelectorAll("s")
 		if (lines[0] != prev || output.firstChild == null) {
 			prev = lines[0];
 			prevCount = 1;
-			OUT(HXX(<li>{{prev}}</li>));
-			return;
+			return HXX(<li>{{prev}}</li>);
 		}
 		var last = output.lastChild;
 		++ prevCount;
@@ -157,31 +156,28 @@ $$("s")  : document.querySelectorAll("s")
 		} else if (last.nodeType == TText) {
 			last.nodeValue = prev + "  " + "(" + prevCount + ")";
 		}
+		return null;
 	}
 
 	function multiple(expr : String) {
 		clearPrev();
-		var li = HXX(<li>
+		return HXX(<li>
 			<a>{{ expr }}</a>
 			<pre>{{ lines.join("\n") }}</pre>
 		</li>);
-		OUT(li);
 	}
 
 	function logInner(expr : String, v : Dynamic) {
 		this.lines = [];
 		parse(v, true);
-		//
+		// collapse
 		var li : DOMElement = cast output.lastChild;
 		if (li != null && li.nodeName == "LI") {
 			var a = li.firstChild;
 			if (a != null && a.nodeName == "A" && (cast a).style.textDecoration != "underline")
 				toggleBlock(cast a);
 		}
-		if (this.isSingle())
-			simple();
-		else
-			multiple(expr);
+		return this.isSingle() ? simple() : multiple(expr);
 	}
 
 	static function attach(obj: js.html.EventTarget, type: String, handler : haxe.Constraints.Function) {
@@ -239,7 +235,9 @@ $$("s")  : document.querySelectorAll("s")
 		var value = mlog.input.value;
 		try {
 			var result = js.Syntax.code("(new Function('return ' + {0}))()", value);
-			mlog.logInner(value, result);
+			var li = mlog.logInner(value, result);
+			if (li != null)
+				mlog.OUT(li);
 		} catch (e : Dynamic) {
 			if (StringTools.fastCodeAt(value, 0) == "?".code) {
 				mlog.usage();
@@ -252,11 +250,23 @@ $$("s")  : document.querySelectorAll("s")
 		}
 	}
 
-	public static function log(v:Dynamic, ?infos:haxe.PosInfos) {
-		var node = HXX(<li>{{v}}</li>);
-		if (infos != null)
-			node.appendChild(HXX(<span class="pos">{{ infos.fileName }}:{{ infos.lineNumber }}</span>));
-		mlog.OUT(node);
+	static function log(v:Dynamic, ?infos:haxe.PosInfos) {
+		var label = js.lib.Object.prototype.toString.call(v);
+		if (infos == null) {
+			var node = mlog.logInner(label, v);
+			if (node != null)
+				mlog.OUT(node);
+		} else {
+			if (infos.customParams != null) {
+				infos.customParams.unshift(v);
+				v = infos.customParams;
+			}
+			var node = mlog.logInner(label, v);
+			if (node != null) {
+				node.appendChild(HXX(<span class="pos">{{ infos.fileName }}:{{ infos.lineNumber }}</span>));
+				mlog.OUT(node);
+			}
+		}
 	}
 
 	// don't do inline here since https://github.com/HaxeFoundation/haxe/issues/6197
@@ -276,7 +286,6 @@ $$("s")  : document.querySelectorAll("s")
 		haxe.Log.trace = log;
 	}
 }
-
 
 extern enum abstract NodeType(Int) to Int {
 	var TElement = 1;

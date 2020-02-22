@@ -68,7 +68,7 @@ class Macros {
 			var branch = ref.split("/")[2]; // refs/heads/master
 			data.ver = branch + " " + hash.substr(0, 7);
 		} catch(e:Dynamic) {
-			data.ver = "0.1.0"; // if download by zip
+			data.ver = "0.1.0"; // if downloaded by zip
 		}
 		return macro $v{data.ver};
 	}
