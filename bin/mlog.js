@@ -285,7 +285,7 @@ MLog.prototype = {
 		this.root.children[1].textContent = "";
 		this.prev = null;
 		this.prevCount = 1;
-		this.root.children[1].appendChild(dt.h("pre",null,"Mini log[ver:" + "master ffc26bd" + "] for IWebBrowser(Embeded IE)\r\ncls      : clear output\r\n$(\"s\")   : document.querySelector(\"s\")\r\n$$(\"s\")  : document.querySelectorAll(\"s\")\r\n"));
+		this.root.children[1].appendChild(dt.h("pre",null,"Mini log[ver:" + "master af60557" + "] for IWebBrowser(Embeded IE)\r\ncls      : clear output\r\n$(\"s\")   : document.querySelector(\"s\")\r\n$$(\"s\")  : document.querySelectorAll(\"s\")\r\n"));
 	}
 	,parse: function(v,first) {
 		switch(typeof(v)) {
@@ -426,28 +426,31 @@ MLog.prototype = {
 	}
 };
 var dt = function() { };
-dt.h = function(name,attr,dyn) {
+dt.h = function(name,attr,sub) {
 	var dom = window.document.createElement(name);
 	if(attr != null) {
 		for(var k in attr) dom.setAttribute(k, attr[k]);
 	}
-	if(dyn != null) {
-		if(((dyn) instanceof Array)) {
-			var i = 0;
-			while(i < dyn.length) {
-				var v = dyn[i];
-				if(typeof(v) == "string") {
-					dom.appendChild(window.document.createTextNode(v));
-				} else {
-					dom.appendChild(v);
-				}
-				++i;
-			}
-		} else {
-			dom.textContent = dyn;
-		}
+	if(sub) {
+		dt.hrec(dom,sub,false);
 	}
 	return dom;
+};
+dt.hrec = function(box,sub,loop) {
+	if(((sub) instanceof Array)) {
+		var i = 0;
+		var len = sub.length;
+		while(i < len) {
+			dt.hrec(box,sub[i],true);
+			++i;
+		}
+	} else if(typeof(sub) != "string" && (((sub) instanceof Element) || ((sub) instanceof Text))) {
+		box.appendChild(sub);
+	} else if(loop) {
+		box.appendChild(window.document.createTextNode(sub));
+	} else {
+		box.textContent = sub;
+	}
 };
 try{Object.defineProperty(js__$Boot_HaxeError.prototype, "message", {get: function(){return String(this.val)}})}catch(e){}
 MLog.main();
