@@ -15,13 +15,17 @@ class MLog {
 
 	var lines : Array<String>;
 
+	var closer(get, never) : js.html.InputElement;
+
 	var input(get, never): js.html.InputElement;
 
 	var output(get, never): js.html.DivElement;
 
-	inline function get_input() return cast root.children[0]; // BEWARE, if the template is modified.
+	inline function get_closer() return cast root.children[0]; // BEWARE, if the template is modified.
 
-	inline function get_output() return cast root.children[1];
+	inline function get_input() return cast root.children[1];
+
+	inline function get_output() return cast root.children[2];
 
 	inline function OUT(e : js.html.Node) output.appendChild(e);
 
@@ -32,6 +36,7 @@ class MLog {
 	public function new() {
 		root = HXX(
 			<div id="mlog">
+				<a>x</a>
 				<input type="text">
 				<div></div>
 			</div>
@@ -44,6 +49,7 @@ class MLog {
 		attach(document.documentElement, "keydown", onShiftF12);
 		attach(input, "keydown", onInputKeydown);
 		attach(output, "click", onLinkClick);
+		attach(closer, "click", onCloser);
 		js.Syntax.code("
 			window.$ = function(s) {return document.querySelector(s)}
 			window.$$ = function(s) {return document.querySelectorAll(s)}
@@ -221,6 +227,12 @@ $$("s")  : document.querySelectorAll("s")
 		var a : DOMElement = cast e.target;
 		if (a.nodeName == "A")
 			toggleBlock(a);
+	}
+
+	static function onCloser( e : js.html.MouseEvent ) {
+		var a : DOMElement = cast e.target;
+		a.parentElement.style.display = "none";
+		e.stopPropagation();
 	}
 
 	static function onContextMenu(e : js.html.MouseEvent) {
