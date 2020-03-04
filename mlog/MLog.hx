@@ -39,6 +39,7 @@ class MLog {
 	}
 
 	function render() {
+		root.style.display = "none";
 		document.body.appendChild(root);
 		attach(document.documentElement, "keydown", onShiftF12);
 		attach(input, "keydown", onInputKeydown);
@@ -116,7 +117,7 @@ $$("s")  : document.querySelectorAll("s")
 		var max = 0;
 		for (i in 0...keys.length) {
 			var k = keys[i];
-			var v = try o[k] catch(e:Dynamic) e; // access may denied
+			var v = try o[k] catch(e:Dynamic) (cast String)(e); // access may denied
 			parse(v, false);
 			size += k.length + (lines[i]).length;
 			if (k.length > max)
