@@ -15,17 +15,21 @@ class MLog {
 
 	var lines : Array<String>;
 
-	var closer(get, never) : js.html.InputElement;
+	var close(get, never) : js.html.LinkElement;
+
+	var clear(get, never) : js.html.LinkElement;
 
 	var input(get, never): js.html.InputElement;
 
 	var output(get, never): js.html.DivElement;
 
-	inline function get_closer() return cast root.children[0]; // BEWARE, if the template is modified.
+	inline function get_close() return cast root.children[0]; // BEWARE, if the template is modified.
 
-	inline function get_input() return cast root.children[1];
+	inline function get_clear() return cast root.children[1];
 
-	inline function get_output() return cast root.children[2];
+	inline function get_input() return cast root.children[2];
+
+	inline function get_output() return cast root.children[3];
 
 	inline function OUT(e : js.html.Node) output.appendChild(e);
 
@@ -37,6 +41,7 @@ class MLog {
 		root = HXX(
 			<div id="mlog">
 				<a>x</a>
+				<a title="clear output">C</a>
 				<input type="text">
 				<div></div>
 			</div>
@@ -49,14 +54,15 @@ class MLog {
 		attach(document.documentElement, "keydown", onShiftF12);
 		attach(input, "keydown", onInputKeydown);
 		attach(output, "click", onLinkClick);
-		attach(closer, "click", onCloser);
+		attach(close, "click", onClose);
+		attach(clear, "click", onClear);
 		js.Syntax.code("
 			window.$ = function(s) {return document.querySelector(s)}
 			window.$$ = function(s) {return document.querySelectorAll(s)}
 		");
 	}
 
-	inline function clearOutput() {
+	function clearOutput() {
 		output.textContent = "";
 		prev = null;
 		prevCount = 1;
@@ -229,10 +235,15 @@ $$("s")  : document.querySelectorAll("s")
 			toggleBlock(a);
 	}
 
-	static function onCloser( e : js.html.MouseEvent ) {
+	static function onClose( e : js.html.MouseEvent ) {
 		var a : DOMElement = cast e.target;
 		a.parentElement.style.display = "none";
 		e.stopPropagation();
+	}
+
+	static function onClear( e : js.html.MouseEvent ) {
+		e.stopPropagation();
+		mlog.clearOutput();
 	}
 
 	static function onContextMenu(e : js.html.MouseEvent) {

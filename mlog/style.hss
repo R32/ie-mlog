@@ -23,8 +23,6 @@
 		box-sizing: border-box;
 		width: $font-size * 1.2;
 		height: $font-size * 1.2;
-		right: -1px;
-		top: $font-size * -1.2;
 		color: #666;
 		cursor: pointer;
 		background-color: transparent;
@@ -32,6 +30,14 @@
 		line-height: 1;
 		font-family: $mono-font;
 		text-align: center;
+		&:first-child {
+			top: $font-size * -1.2;
+			right: -1px;
+		}
+		&[title^=clear] {
+			top: $pad4 * 2 + $font-size + 5; // padding + fontSize + borderWidth
+			left: $font-size * -1.2;
+		}
 	}
 	> input[type=text] {
 		display: block;
