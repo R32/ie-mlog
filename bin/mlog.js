@@ -155,7 +155,7 @@ js__$Boot_HaxeError.__super__ = Error;
 js__$Boot_HaxeError.prototype = $extend(Error.prototype,{
 });
 var MLog = function() {
-	this.root = dt.h("div",{ id : "mlog"},[dt.h("a",null,"x"),dt.h("input",{ type : "text"}),dt.h("div")]);
+	this.root = dt.h("div",{ id : "mlog"},[dt.h("a",null,"x"),dt.h("a",{ title : "clear output"},"C"),dt.h("input",{ type : "text"}),dt.h("div")]);
 };
 MLog.attach = function(obj,type,handler) {
 	if(obj.addEventListener != null) {
@@ -190,9 +190,13 @@ MLog.onLinkClick = function(e) {
 		MLog.toggleBlock(a);
 	}
 };
-MLog.onCloser = function(e) {
+MLog.onClose = function(e) {
 	e.target.parentElement.style.display = "none";
 	e.stopPropagation();
+};
+MLog.onClear = function(e) {
+	e.stopPropagation();
+	MLog.mlog.clearOutput();
 };
 MLog.onInputKeydown = function(e) {
 	if(!e.shiftKey) {
@@ -201,27 +205,24 @@ MLog.onInputKeydown = function(e) {
 	if(e.keyCode != 13) {
 		return;
 	}
-	var value = MLog.mlog.root.children[1].value;
+	var value = MLog.mlog.root.children[2].value;
 	try {
 		var result = (new Function('return ' + value))();
 		var li = MLog.mlog.logInner(value,result);
 		if(li != null) {
-			MLog.mlog.root.children[2].appendChild(li);
+			MLog.mlog.root.children[3].appendChild(li);
 		}
 	} catch( e1 ) {
 		var e2 = ((e1) instanceof js__$Boot_HaxeError) ? e1.val : e1;
 		if(value.charCodeAt(0) == 63) {
 			MLog.mlog.usage();
 		} else if(value == "cls") {
-			var _this = MLog.mlog;
-			_this.root.children[2].textContent = "";
-			_this.prev = null;
-			_this.prevCount = 1;
+			MLog.mlog.clearOutput();
 		} else {
-			MLog.mlog.root.children[2].appendChild(dt.h("li",{ 'class' : "err"},e2));
+			MLog.mlog.root.children[3].appendChild(dt.h("li",{ 'class' : "err"},e2));
 			return;
 		}
-		MLog.mlog.root.children[1].value = "";
+		MLog.mlog.root.children[2].value = "";
 	}
 };
 MLog.objLabel = function(o) {
@@ -243,7 +244,7 @@ MLog.log = function(v,infos) {
 	if(infos == null) {
 		var node = MLog.mlog.logInner(label,v);
 		if(node != null) {
-			MLog.mlog.root.children[2].appendChild(node);
+			MLog.mlog.root.children[3].appendChild(node);
 		}
 	} else {
 		if(infos.customParams != null) {
@@ -253,12 +254,12 @@ MLog.log = function(v,infos) {
 		var node1 = MLog.mlog.logInner(label,v);
 		if(node1 != null) {
 			node1.appendChild(dt.h("span",{ 'class' : "pos"},infos.fileName + ":" + infos.lineNumber));
-			MLog.mlog.root.children[2].appendChild(node1);
+			MLog.mlog.root.children[3].appendChild(node1);
 		}
 	}
 };
 MLog.injectCSS = function() {
-	var css = "#mlog{position:fixed;display:none;left:10%;right:10%;bottom:0;min-width:600px;border:#999999 1px solid;color:#2f363d;z-index:10;}#mlog>a{position:absolute;display:block;box-sizing:border-box;width:19.2px;height:19.2px;right:-1px;top:-19.2px;color:#666;cursor:pointer;background-color:transparent;border:1px solid #999999;line-height:1;font-family:consolas,monospace;text-align:center;}#mlog>input[type=text]{display:block;width:100%;box-sizing:border-box;padding:4px 0;font-family:Arial,sans-serif;color:inherit;font-size:16px;}#mlog>div{height:192px;font-family:consolas,monospace;background-color:#efefef;white-space:pre;overflow-y:auto;font-size:14px;list-style:none;}#mlog>div>pre{margin:0;font-family:consolas,monospace;color:#0366d6;}#mlog>div>li{margin:0;padding:0;border:1px #efefef solid;}#mlog>div>li pre{margin:0;padding-left:20px;}#mlog>div>li a{cursor:pointer;color:#0366d6;text-decoration:none;}#mlog>div>li.err{color:#f00;background-color:#ffeded;border-top-color:#da9393;border-bottom-color:#da9393;}#mlog>div span.ct{vertical-align:top;padding:1px 4px;margin-left:2px;background-color:#998fc7;color:#fff;font-size:12px;}#mlog>div span.pos{color:#666;float:right;text-align:right;padding:1px 2px 0 0;font-size:12px;}";
+	var css = "#mlog{position:fixed;display:none;left:10%;right:10%;bottom:0;min-width:600px;border:#999999 1px solid;color:#2f363d;z-index:10;}#mlog>a{position:absolute;display:block;box-sizing:border-box;width:19.2px;height:19.2px;color:#666;cursor:pointer;background-color:transparent;border:1px solid #999999;line-height:1;font-family:consolas,monospace;text-align:center;}#mlog>a:first-child{top:-19.2px;right:-1px;}#mlog>a[title^=clear]{top:29px;left:-19.2px;}#mlog>input[type=text]{display:block;width:100%;box-sizing:border-box;padding:4px 0;font-family:Arial,sans-serif;color:inherit;font-size:16px;}#mlog>div{height:192px;font-family:consolas,monospace;background-color:#efefef;white-space:pre;overflow-y:auto;font-size:14px;list-style:none;}#mlog>div>pre{margin:0;font-family:consolas,monospace;color:#0366d6;}#mlog>div>li{margin:0;padding:0;border:1px #efefef solid;}#mlog>div>li pre{margin:0;padding-left:20px;}#mlog>div>li a{cursor:pointer;color:#0366d6;text-decoration:none;}#mlog>div>li.err{color:#f00;background-color:#ffeded;border-top-color:#da9393;border-bottom-color:#da9393;}#mlog>div span.ct{vertical-align:top;padding:1px 4px;margin-left:2px;background-color:#998fc7;color:#fff;font-size:12px;}#mlog>div span.pos{color:#666;float:right;text-align:right;padding:1px 2px 0 0;font-size:12px;}";
 	var tmp = window.document.querySelector("head");
 	var n = dt.h("style",{ type : "text/css"});
 	if(n.styleSheet) {
@@ -279,19 +280,23 @@ MLog.prototype = {
 		this.root.style.display = "none";
 		window.document.body.appendChild(this.root);
 		MLog.attach(window.document.documentElement,"keydown",MLog.onShiftF12);
-		MLog.attach(this.root.children[1],"keydown",MLog.onInputKeydown);
-		MLog.attach(this.root.children[2],"click",MLog.onLinkClick);
-		MLog.attach(this.root.children[0],"click",MLog.onCloser);
+		MLog.attach(this.root.children[2],"keydown",MLog.onInputKeydown);
+		MLog.attach(this.root.children[3],"click",MLog.onLinkClick);
+		MLog.attach(this.root.children[0],"click",MLog.onClose);
+		MLog.attach(this.root.children[1],"click",MLog.onClear);
 		
 			window.$ = function(s) {return document.querySelector(s)}
 			window.$$ = function(s) {return document.querySelectorAll(s)}
 		;
 	}
-	,usage: function() {
-		this.root.children[2].textContent = "";
+	,clearOutput: function() {
+		this.root.children[3].textContent = "";
 		this.prev = null;
 		this.prevCount = 1;
-		this.root.children[2].appendChild(dt.h("pre",null,"Mini log[ver:" + "master 6ca5669" + "] for IWebBrowser(Embeded IE)\r\ncls      : clear output\r\n$(\"s\")   : document.querySelector(\"s\")\r\n$$(\"s\")  : document.querySelectorAll(\"s\")\r\n"));
+	}
+	,usage: function() {
+		this.clearOutput();
+		this.root.children[3].appendChild(dt.h("pre",null,"Mini log[ver:" + "master 33af505" + "] for IWebBrowser(Embeded IE)\r\ncls      : clear output\r\n$(\"s\")   : document.querySelector(\"s\")\r\n$$(\"s\")  : document.querySelectorAll(\"s\")\r\n"));
 	}
 	,parse: function(v,first) {
 		switch(typeof(v)) {
@@ -391,12 +396,12 @@ MLog.prototype = {
 		}
 	}
 	,simple: function() {
-		if(this.lines[0] != this.prev || this.root.children[2].firstChild == null) {
+		if(this.lines[0] != this.prev || this.root.children[3].firstChild == null) {
 			this.prev = this.lines[0];
 			this.prevCount = 1;
 			return dt.h("li",null,this.prev);
 		}
-		var last = this.root.children[2].lastChild;
+		var last = this.root.children[3].lastChild;
 		++this.prevCount;
 		if(last.nodeType == 1) {
 			var conter = last.querySelector(".ct");
@@ -417,7 +422,7 @@ MLog.prototype = {
 	,logInner: function(expr,v) {
 		this.lines = [];
 		this.parse(v,true);
-		var li = this.root.children[2].lastChild;
+		var li = this.root.children[3].lastChild;
 		if(li != null && li.nodeName == "LI") {
 			var a = li.firstChild;
 			if(a != null && a.nodeName == "A" && a.style.textDecoration != "underline") {
