@@ -259,7 +259,7 @@ MLog.log = function(v,infos) {
 	}
 };
 MLog.injectCSS = function() {
-	var css = "#mlog{position:fixed;display:none;left:10%;right:10%;bottom:0;min-width:600px;border:#999999 1px solid;color:#2f363d;z-index:10;}#mlog>a{position:absolute;display:block;box-sizing:border-box;width:19.2px;height:19.2px;color:#666;cursor:pointer;background-color:transparent;border:1px solid #999999;line-height:1;font-family:consolas,monospace;text-align:center;}#mlog>a:first-child{top:-19.2px;right:-1px;}#mlog>a[title^=clear]{top:29px;left:-19.2px;}#mlog>input[type=text]{display:block;width:100%;box-sizing:border-box;padding:4px 0;font-family:Arial,sans-serif;color:inherit;font-size:16px;}#mlog>div{height:192px;font-family:consolas,monospace;background-color:#efefef;white-space:pre;overflow-y:auto;font-size:14px;list-style:none;}#mlog>div>pre{margin:0;font-family:consolas,monospace;color:#0366d6;}#mlog>div>li{margin:0;padding:0;border:1px #efefef solid;}#mlog>div>li pre{margin:0;padding-left:20px;}#mlog>div>li a{cursor:pointer;color:#0366d6;text-decoration:none;}#mlog>div>li.err{color:#f00;background-color:#ffeded;border-top-color:#da9393;border-bottom-color:#da9393;}#mlog>div span.ct{vertical-align:top;padding:1px 4px;margin-left:2px;background-color:#998fc7;color:#fff;font-size:12px;}#mlog>div span.pos{color:#666;float:right;text-align:right;padding:1px 2px 0 0;font-size:12px;}";
+	var css = "#mlog{position:fixed;display:none;left:10%;right:10%;bottom:0;min-width:600px;border:#999999 1px solid;color:#2f363d;z-index:10;}#mlog>a{position:absolute;display:block;box-sizing:border-box;width:19.2px;height:19.2px;color:#666;cursor:pointer;background-color:transparent;border:1px solid #999999;line-height:1;font-family:consolas,monospace;font-size:16px;text-align:center;}#mlog>a:first-child{top:-19.2px;right:-1px;}#mlog>a[title^=clear]{top:29px;left:-19.2px;}#mlog>input[type=text]{display:block;width:100%;box-sizing:border-box;padding:4px 0;font-family:Arial,sans-serif;color:inherit;font-size:16px;}#mlog>div{height:192px;font-family:consolas,monospace;background-color:#efefef;white-space:pre;overflow-y:auto;font-size:14px;list-style:none;}#mlog>div>pre{margin:0;font-family:consolas,monospace;color:#0366d6;}#mlog>div>li{margin:0;padding:0;border:1px #efefef solid;}#mlog>div>li pre{margin:0;padding-left:20px;}#mlog>div>li a{cursor:pointer;color:#0366d6;text-decoration:none;}#mlog>div>li.err{color:#f00;background-color:#ffeded;border-top-color:#da9393;border-bottom-color:#da9393;}#mlog>div span.ct{vertical-align:top;padding:1px 4px;margin-left:2px;background-color:#998fc7;color:#fff;font-size:12px;}#mlog>div span.pos{color:#666;float:right;text-align:right;padding:1px 2px 0 0;font-size:12px;}";
 	var tmp = window.document.querySelector("head");
 	var n = dt.h("style",{ type : "text/css"});
 	if(n.styleSheet) {
@@ -296,7 +296,7 @@ MLog.prototype = {
 	}
 	,usage: function() {
 		this.clearOutput();
-		this.root.children[3].appendChild(dt.h("pre",null,"Mini log[ver:" + "master 33af505" + "] for IWebBrowser(Embeded IE)\r\ncls      : clear output\r\n$(\"s\")   : document.querySelector(\"s\")\r\n$$(\"s\")  : document.querySelectorAll(\"s\")\r\n"));
+		this.root.children[3].appendChild(dt.h("pre",null,"Mini log[ver:" + "master ef33e5d" + "] for IWebBrowser(Embeded IE)\r\ncls      : clear output\r\n$(\"s\")   : document.querySelector(\"s\")\r\n$$(\"s\")  : document.querySelectorAll(\"s\")\r\n"));
 	}
 	,parse: function(v,first) {
 		switch(typeof(v)) {

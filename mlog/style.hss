@@ -29,6 +29,7 @@
 		border: 1px solid #999999;
 		line-height: 1;
 		font-family: $mono-font;
+		font-size: $font-size;
 		text-align: center;
 		&:first-child {
 			top: $font-size * -1.2;
