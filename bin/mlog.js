@@ -226,6 +226,9 @@ MLog.onInputKeydown = function(e) {
 	}
 };
 MLog.objLabel = function(o) {
+	if(o == null) {
+		return String(o);
+	}
 	var ctor = o.constructor;
 	if(ctor == null) {
 		return Object.prototype.toString.call(o);
@@ -296,7 +299,7 @@ MLog.prototype = {
 	}
 	,usage: function() {
 		this.clearOutput();
-		this.root.children[3].appendChild(dt.h("pre",null,"Mini log[ver:" + "master ef33e5d" + "] for IWebBrowser(Embeded IE)\r\ncls      : clear output\r\n$(\"s\")   : document.querySelector(\"s\")\r\n$$(\"s\")  : document.querySelectorAll(\"s\")\r\n"));
+		this.root.children[3].appendChild(dt.h("pre",null,"Mini log[ver:" + "master 474f628" + "] for IWebBrowser(Embeded IE)\r\ncls      : clear output\r\n$(\"s\")   : document.querySelector(\"s\")\r\n$$(\"s\")  : document.querySelectorAll(\"s\")\r\n"));
 	}
 	,parse: function(v,first) {
 		switch(typeof(v)) {

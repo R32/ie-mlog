@@ -274,6 +274,8 @@ $$("s")  : document.querySelectorAll("s")
 	}
 
 	static function objLabel(o : Dynamic) : String {
+		if (o == null)
+			return (cast String)(o);
 		var ctor = o.constructor;
 		if (ctor == null)
 			return js.lib.Object.prototype.toString.call(o);
