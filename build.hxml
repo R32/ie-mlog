@@ -1,7 +1,6 @@
 -dce full
 -D analyzer-optimize
 -D js-es=3
--D js-classic
 -lib no-vdom
 --macro includeFile('mlog/polyfill.js')
 -main mlog.MLog

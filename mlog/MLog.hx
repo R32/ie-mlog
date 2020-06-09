@@ -8,6 +8,7 @@ import js.Browser.document;
 /**
  Press "shift + F12" to lanuch.
 */
+@:expose
 @:native("MLog")
 class MLog {
 
@@ -244,10 +245,6 @@ $$("s")  : document.querySelectorAll("s")
 	static function onClear( e : js.html.MouseEvent ) {
 		e.stopPropagation();
 		mlog.clearOutput();
-	}
-
-	static function onContextMenu(e : js.html.MouseEvent) {
-		// TODO: clear console
 	}
 
 	static function onInputKeydown(e: js.html.KeyboardEvent) {

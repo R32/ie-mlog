@@ -10,6 +10,8 @@ if (window.console == null) {
 			var p = args[0].split(":");
 			if (p.length >= 3) {
 				args = slice.call(args, 1);
+				if (args.length == 0)
+					args = [slice.call(p, 2).join(":")];
 				pinfo = {fileName: p[0], lineNumber: p[1] | 0};
 			}
 			MLog.log(args.length == 1 ? args[0] : args, pinfo);
