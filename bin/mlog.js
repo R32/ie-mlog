@@ -134,26 +134,6 @@ haxe_Exception.prototype = $extend(Error.prototype,{
 		return this.__nativeException;
 	}
 });
-var haxe_Log = function() { };
-haxe_Log.formatOutput = function(v,infos) {
-	var str = Std.string(v);
-	if(infos == null) {
-		return str;
-	}
-	var pstr = infos.fileName + ":" + infos.lineNumber;
-	if(infos.customParams != null) {
-		var _g = 0;
-		var _g1 = infos.customParams;
-		while(_g < _g1.length) str += ", " + Std.string(_g1[_g++]);
-	}
-	return pstr + ": " + str;
-};
-haxe_Log.trace = function(v,infos) {
-	var str = haxe_Log.formatOutput(v,infos);
-	if(typeof(console) != "undefined" && console.log != null) {
-		console.log(str);
-	}
-};
 var haxe_ValueException = function(value,previous,$native) {
 	haxe_Exception.call(this,String(value),previous,$native);
 	this.value = value;
@@ -308,7 +288,6 @@ MLog.main = function() {
 	MLog.injectCSS();
 	MLog.mlog = new MLog();
 	MLog.mlog.render();
-	haxe_Log.trace = MLog.log;
 };
 MLog.prototype = {
 	get_close: function() {
@@ -358,7 +337,7 @@ MLog.prototype = {
 	}
 	,usage: function() {
 		this.clearOutput();
-		this.root.children[3].appendChild(dt.h("pre",null,"Mini log[ver:" + "master def557e" + "] for IWebBrowser(Embeded IE)\r\ncls      : clear output\r\n$(\"s\")   : document.querySelector(\"s\")\r\n$$(\"s\")  : document.querySelectorAll(\"s\")\r\n"));
+		this.root.children[3].appendChild(dt.h("pre",null,"Mini log[ver:" + "master 64da39c" + "] for IWebBrowser(Embeded IE)\r\ncls      : clear output\r\n$(\"s\")   : document.querySelector(\"s\")\r\n$$(\"s\")  : document.querySelectorAll(\"s\")\r\n"));
 	}
 	,parse: function(v,first) {
 		switch(typeof(v)) {

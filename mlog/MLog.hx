@@ -317,7 +317,6 @@ $$("s")  : document.querySelectorAll("s")
 		injectCSS();
 		mlog = new MLog();
 		mlog.render();
-		haxe.Log.trace = log;
 	}
 }
 
