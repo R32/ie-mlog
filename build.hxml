@@ -3,5 +3,6 @@
 -D js-es=3
 -lib no-vdom
 --macro includeFile('mlog/polyfill.js')
+--macro exclude('haxe.iterators.ArrayIterator')
 -main mlog.MLog
 -js bin/mlog.js

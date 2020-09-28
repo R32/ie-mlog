@@ -10,7 +10,6 @@ import mlog.Macros.text;
 /**
  Press "shift + F12" to lanuch.
 */
-@:expose
 @:native("MLog")
 class MLog {
 
@@ -260,7 +259,7 @@ $$("s")  : document.querySelectorAll("s")
 		return "[" + "object" +"]";
 	}
 
-	static function log( v : Dynamic, ?infos : haxe.PosInfos ) {
+	@:keep static function log( v : Dynamic, ?infos : haxe.PosInfos ) {
 		var label = objLabel(v);
 		if (infos == null) {
 			var node = mlog.logInner(label, v);
@@ -293,6 +292,7 @@ $$("s")  : document.querySelectorAll("s")
 		injectCSS();
 		mlog = new MLog();
 		mlog.render();
+		js.Syntax.code("window.MLog = {0}",MLog);
 	}
 }
 
