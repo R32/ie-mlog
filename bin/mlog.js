@@ -79,7 +79,7 @@ if (!Date.now) {
 	Date.now = function now() { return new Date().getTime(); };
 }
 
-;(function (console, $hx_exports, $global) { "use strict";
+;(function (console, $global) { "use strict";
 function $extend(from, fields) {
 	function Inherit() {} Inherit.prototype = from; var proto = new Inherit();
 	for (var name in fields) proto[name] = fields[name];
@@ -144,20 +144,13 @@ haxe_ValueException.prototype = $extend(haxe_Exception.prototype,{
 		return this.value;
 	}
 });
-var haxe_iterators_ArrayIterator = function(array) {
-	this.current = 0;
-	this.array = array;
-};
-haxe_iterators_ArrayIterator.prototype = {
-	hasNext: function() {
-		return this.current < this.array.length;
-	}
-	,next: function() {
-		return this.array[this.current++];
-	}
-};
-var MLog = $hx_exports["MLog"] = function() {
-	this.root = dt.h("div",{ id : "mlog"},[dt.h("a",null,"x"),dt.h("a",{ title : "clear output"},"C"),dt.h("input",{ type : "text"}),dt.h("div")]);
+var MLog = function() {
+	var tmp = dt.h("a",{ title : "close"},"x");
+	var tmp1 = dt.h("a",{ title : "clear output"},"c");
+	var tmp2 = dt.h("a",{ title : "refresh"},"r");
+	var tmp3 = dt.h("input",{ type : "text"});
+	var tmp4 = document.createElement("div");
+	this.ui = dt.h("div",{ id : "mlog"},[tmp,tmp1,tmp2,tmp3,tmp4]);
 };
 MLog.attach = function(obj,type,handler) {
 	if(obj.addEventListener != null) {
@@ -166,17 +159,10 @@ MLog.attach = function(obj,type,handler) {
 		obj.attachEvent("on" + type,handler);
 	}
 };
-MLog.detach = function(obj,type,handler) {
-	if(obj.addEventListener != null) {
-		obj.removeEventListener(type,handler);
-	} else {
-		obj.detachEvent("on" + type,handler);
-	}
-};
 MLog.onShiftF12 = function(e) {
 	if(e.shiftKey && e.keyCode == 123) {
 		var _this = MLog.mlog;
-		_this.root.style.display = _this.root.style.display == "none" ? "block" : "none";
+		_this.ui.style.display = _this.ui.style.display == "none" ? "block" : "none";
 		e.preventDefault();
 		e.stopPropagation();
 	}
@@ -192,20 +178,26 @@ MLog.toggleBlock = function(a) {
 		a.style.textDecoration = "underline";
 	}
 };
-MLog.onLinkClick = function(e) {
+MLog.onClick = function(e) {
 	e.stopPropagation();
 	var a = e.target;
-	if(a.nodeName == "A") {
+	if(a.tagName != "A") {
+		return;
+	}
+	var ui = MLog.mlog.ui;
+	switch(a.innerText) {
+	case "c":
+		MLog.mlog.clearOutput();
+		break;
+	case "r":
+		window.location.reload();
+		break;
+	case "x":
+		ui.style.display = "none";
+		break;
+	default:
 		MLog.toggleBlock(a);
 	}
-};
-MLog.onClose = function(e) {
-	e.target.parentElement.style.display = "none";
-	e.stopPropagation();
-};
-MLog.onClear = function(e) {
-	e.stopPropagation();
-	MLog.mlog.clearOutput();
 };
 MLog.onInputKeydown = function(e) {
 	if(!e.shiftKey) {
@@ -214,12 +206,12 @@ MLog.onInputKeydown = function(e) {
 	if(e.keyCode != 13) {
 		return;
 	}
-	var value = MLog.mlog.root.children[2].value;
+	var value = MLog.mlog.ui.children[3].value;
 	try {
 		var result = (new Function('return ' + value))();
 		var li = MLog.mlog.logInner(value,result);
 		if(li != null) {
-			MLog.mlog.root.children[3].appendChild(li);
+			MLog.mlog.ui.children[4].appendChild(li);
 		}
 	} catch( _g ) {
 		var _g1 = haxe_Exception.caught(_g).unwrap();
@@ -228,10 +220,10 @@ MLog.onInputKeydown = function(e) {
 		} else if(value == "cls") {
 			MLog.mlog.clearOutput();
 		} else {
-			MLog.mlog.root.children[3].appendChild(dt.h("li",{ 'class' : "err"},_g1));
+			MLog.mlog.ui.children[4].appendChild(dt.h("li",{ 'class' : "err"},_g1));
 			return;
 		}
-		MLog.mlog.root.children[2].value = "";
+		MLog.mlog.ui.children[3].value = "";
 	}
 };
 MLog.objLabel = function(o) {
@@ -256,7 +248,7 @@ MLog.log = function(v,infos) {
 	if(infos == null) {
 		var node = MLog.mlog.logInner(label,v);
 		if(node != null) {
-			MLog.mlog.root.children[3].appendChild(node);
+			MLog.mlog.ui.children[4].appendChild(node);
 		}
 	} else {
 		if(infos.customParams != null) {
@@ -266,12 +258,12 @@ MLog.log = function(v,infos) {
 		var node = MLog.mlog.logInner(label,v);
 		if(node != null) {
 			node.appendChild(dt.h("span",{ 'class' : "pos"},infos.fileName + ":" + infos.lineNumber));
-			MLog.mlog.root.children[3].appendChild(node);
+			MLog.mlog.ui.children[4].appendChild(node);
 		}
 	}
 };
 MLog.injectCSS = function() {
-	var css = "#mlog{position:fixed;display:none;left:10%;right:10%;bottom:0;min-width:600px;border:#999999 1px solid;color:#2f363d;z-index:10;}#mlog>a{position:absolute;display:block;box-sizing:border-box;width:19.2px;height:19.2px;color:#666;cursor:pointer;background-color:transparent;border:1px solid #999999;line-height:1;font-family:consolas,monospace;font-size:16px;text-align:center;}#mlog>a:first-child{top:-19.2px;right:-1px;}#mlog>a[title^=clear]{top:29px;left:-19.2px;}#mlog>input[type=text]{display:block;width:100%;box-sizing:border-box;padding:4px 0;font-family:Arial,sans-serif;color:inherit;font-size:16px;}#mlog>div{height:192px;font-family:consolas,monospace;background-color:#efefef;white-space:pre;overflow-y:auto;font-size:14px;list-style:none;}#mlog>div>pre{margin:0;font-family:consolas,monospace;color:#0366d6;}#mlog>div>li{margin:0;padding:0;border:1px #efefef solid;}#mlog>div>li pre{margin:0;padding-left:20px;}#mlog>div>li a{cursor:pointer;color:#0366d6;text-decoration:none;}#mlog>div>li.err{color:#f00;background-color:#ffeded;border-top-color:#da9393;border-bottom-color:#da9393;}#mlog>div span.ct{vertical-align:top;padding:1px 4px;margin-left:2px;background-color:#998fc7;color:#fff;font-size:12px;}#mlog>div span.pos{color:#666;float:right;text-align:right;padding:1px 2px 0 0;font-size:12px;}";
+	var css = "#mlog{position:fixed;display:none;left:10%;right:10%;bottom:0;min-width:600px;border:#999999 1px solid;color:#2f363d;z-index:10;}#mlog>a{position:absolute;display:block;box-sizing:border-box;width:20px;height:20px;line-height:1;color:#666;cursor:pointer;background-color:transparent;border:1px solid #999999;font-family:consolas,monospace;font-size:16px;text-align:center;}#mlog>a:first-child{top:-20px;right:-1px;}#mlog>a[title^=clear]{top:29px;left:-20px;}#mlog>a[title=refresh]{top:-20px;right:18px;}#mlog>input[type=text]{display:block;width:100%;box-sizing:border-box;padding:4px 0;font-family:Arial,sans-serif;color:inherit;font-size:16px;outline:0;}#mlog>input[type=text]::-ms-clear{display:none;}#mlog>div{height:192px;font-family:consolas,monospace;background-color:#efefef;white-space:pre;overflow-y:auto;font-size:14px;list-style:none;}#mlog>div>pre{margin:0;font-family:consolas,monospace;color:#0366d6;}#mlog>div>li{margin:0;padding:0;border:1px #efefef solid;}#mlog>div>li pre{margin:0;padding-left:20px;}#mlog>div>li a{cursor:pointer;color:#0366d6;text-decoration:none;}#mlog>div>li.err{color:#f00;background-color:#ffeded;border-top-color:#da9393;border-bottom-color:#da9393;}#mlog>div span.ct{vertical-align:top;padding:1px 4px;margin-left:2px;background-color:#998fc7;color:#fff;font-size:12px;}#mlog>div span.pos{color:#666;float:right;text-align:right;padding:1px 2px 0 0;font-size:12px;}";
 	var tmp = window.document.querySelector("head");
 	var n = dt.h("style",{ type : "text/css"});
 	if(n.styleSheet) {
@@ -281,63 +273,34 @@ MLog.injectCSS = function() {
 	}
 	tmp.appendChild(n);
 };
-MLog.one = function(s) {
-	return window.document.querySelector(s);
-};
 MLog.main = function() {
 	MLog.injectCSS();
 	MLog.mlog = new MLog();
 	MLog.mlog.render();
+	window.MLog = MLog;
 };
 MLog.prototype = {
-	get_close: function() {
-		return this.root.children[0];
-	}
-	,get_clear: function() {
-		return this.root.children[1];
-	}
-	,get_input: function() {
-		return this.root.children[2];
-	}
-	,get_output: function() {
-		return this.root.children[3];
-	}
-	,OUT: function(e) {
-		this.root.children[3].appendChild(e);
-	}
-	,PUSH: function(s) {
-		this.lines.push(s);
-	}
-	,isSingle: function() {
-		return this.lines.length == 1;
-	}
-	,render: function() {
-		this.root.style.display = "none";
-		window.document.body.appendChild(this.root);
+	render: function() {
+		this.ui.style.display = "none";
+		window.document.body.appendChild(this.ui);
 		MLog.attach(window.document.documentElement,"keydown",MLog.onShiftF12);
-		MLog.attach(this.root.children[2],"keydown",MLog.onInputKeydown);
-		MLog.attach(this.root.children[3],"click",MLog.onLinkClick);
-		MLog.attach(this.root.children[0],"click",MLog.onClose);
-		MLog.attach(this.root.children[1],"click",MLog.onClear);
+		MLog.attach(this.ui.children[3],"keydown",MLog.onInputKeydown);
+		MLog.attach(this.ui,"click",MLog.onClick);
 		
 			window.$ = function(s) {return document.querySelector(s)}
 			window.$$ = function(s) {return document.querySelectorAll(s)}
 		;
 	}
 	,clearOutput: function() {
-		this.root.children[3].textContent = "";
+		this.ui.children[4].innerText = "";
 		this.prev = null;
 		this.prevCount = 1;
 	}
-	,clearInput: function() {
-		this.root.children[2].value = "";
-	}
-	,toggle: function() {
-		this.root.style.display = this.root.style.display == "none" ? "block" : "none";
-	}
 	,usage: function() {
 		this.clearOutput();
-		this.root.children[3].appendChild(dt.h("pre",null,"Mini log[ver:" + "master 64da39c" + "] for IWebBrowser(Embeded IE)\r\ncls      : clear output\r\n$(\"s\")   : document.querySelector(\"s\")\r\n$$(\"s\")  : document.querySelectorAll(\"s\")\r\n"));
+		var pre = document.createElement("pre");
+		pre.innerText = "Mini log[ver:{{Macros.gitVersion()}}] for IWebBrowser(Embeded IE)\r\ncls      : clear output\r\n$(\"s\")   : document.querySelector(\"s\")\r\n$" + "(\"s\")  : document.querySelectorAll(\"s\")\r\n";
+		this.ui.children[4].appendChild(pre);
 	}
 	,parse: function(v,first) {
 		switch(typeof(v)) {
@@ -436,16 +399,13 @@ MLog.prototype = {
 			}
 		}
 	}
-	,clearPrev: function() {
-		this.prev = null;
-	}
 	,simple: function() {
-		if(this.lines[0] != this.prev || this.root.children[3].firstChild == null) {
+		if(this.lines[0] != this.prev || this.ui.children[4].firstChild == null) {
 			this.prev = this.lines[0];
 			this.prevCount = 1;
 			return dt.h("li",null,this.prev);
 		}
-		var last = this.root.children[3].lastChild;
+		var last = this.ui.children[4].lastChild;
 		++this.prevCount;
 		if(last.nodeType == 1) {
 			var conter = last.querySelector(".ct");
@@ -466,7 +426,7 @@ MLog.prototype = {
 	,logInner: function(expr,v) {
 		this.lines = [];
 		this.parse(v,true);
-		var li = this.root.children[3].lastChild;
+		var li = this.ui.children[4].lastChild;
 		if(li != null && li.nodeName == "LI") {
 			var a = li.firstChild;
 			if(a != null && a.nodeName == "A" && a.style.textDecoration != "underline") {
@@ -508,4 +468,4 @@ dt.hrec = function(box,sub,loop) {
 	}
 };
 MLog.main();
-})(typeof console != "undefined" ? console : {log:function(){}}, typeof exports != "undefined" ? exports : typeof window != "undefined" ? window : typeof self != "undefined" ? self : this, {});
+})(typeof console != "undefined" ? console : {log:function(){}}, {});
