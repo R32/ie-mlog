@@ -4,6 +4,8 @@ import Nvd.HXX;
 import js.html.DOMElement;
 import js.Browser.window;
 import js.Browser.document;
+import mlog.Macros.display;
+import mlog.Macros.text;
 
 /**
  Press "shift + F12" to lanuch.
@@ -12,51 +14,29 @@ import js.Browser.document;
 @:native("MLog")
 class MLog {
 
-	var root : DOMElement;
+	static inline var CSS_NONE = "none";
+	static inline var CSS_BLOCK = "block";
+
+	var ui : Ui;
 
 	var lines : Array<String>;
 
-	var close(get, never) : js.html.LinkElement;
-
-	var clear(get, never) : js.html.LinkElement;
-
-	var input(get, never): js.html.InputElement;
-
-	var output(get, never): js.html.DivElement;
-
-	inline function get_close() return cast root.children[0]; // BEWARE, if the template is modified.
-
-	inline function get_clear() return cast root.children[1];
-
-	inline function get_input() return cast root.children[2];
-
-	inline function get_output() return cast root.children[3];
-
-	inline function OUT(e : js.html.Node) output.appendChild(e);
+	inline function OUT(e : js.html.Node) ui.output.appendChild(e);
 
 	inline function PUSH(s) lines.push(s);
 
 	inline function isSingle() return lines.length == 1;
 
 	public function new() {
-		root = HXX(
-			<div id="mlog">
-				<a>x</a>
-				<a title="clear output">C</a>
-				<input type="text">
-				<div></div>
-			</div>
-		);
+		ui = Ui.create();
 	}
 
 	function render() {
-		root.style.display = "none";
-		document.body.appendChild(root);
+		display(ui) = "none";
+		document.body.appendChild(ui);
 		attach(document.documentElement, "keydown", onShiftF12);
-		attach(input, "keydown", onInputKeydown);
-		attach(output, "click", onLinkClick);
-		attach(close, "click", onClose);
-		attach(clear, "click", onClear);
+		attach(ui.input, "keydown", onInputKeydown);
+		attach(ui.dom, "click", onClick);
 		js.Syntax.code("
 			window.$ = function(s) {return document.querySelector(s)}
 			window.$$ = function(s) {return document.querySelectorAll(s)}
@@ -64,26 +44,26 @@ class MLog {
 	}
 
 	function clearOutput() {
-		output.textContent = "";
+		text(ui.output) = "";
 		prev = null;
 		prevCount = 1;
 	}
 
-	inline function clearInput() input.value = "";
+	inline function clearInput() ui.input.value = "";
 
-	inline function toggle() root.style.display = root.style.display == "none" ? "block" : "none";
+	inline function toggle() display(ui) = display(ui) == CSS_NONE ? CSS_BLOCK : CSS_NONE;
 
 	function usage() {
 		this.clearOutput();
-		OUT( HXX(
-<pre>Mini log[ver:{{Macros.gitVersion()}}] for IWebBrowser(Embeded IE)
+		var pre = HXX( <pre/> );
+		text(pre) = 'Mini log[ver:{{Macros.gitVersion()}}] for IWebBrowser(Embeded IE)
 cls      : clear output
 $("s")   : document.querySelector("s")
 $$("s")  : document.querySelectorAll("s")
-</pre>
-		));
+';
+		OUT(pre);
 	}
-	function parse(v : Dynamic, first : Bool ) {
+	function parse( v : Dynamic, first : Bool ) {
 		switch( js.Syntax.typeof(v) ) {
 		case "string":
 			PUSH('"' + v +'"');
@@ -98,7 +78,7 @@ $$("s")  : document.querySelectorAll("s")
 			PUSH((cast String)(v));
 		}
 	}
-	function s_array(a : Array<Dynamic>, rec : Bool) {
+	function s_array( a : Array<Dynamic>, rec : Bool ) {
 		if(!rec)
 			return PUSH("[" + (a.length == 0 ? "" : "array") + "]");
 		var i = 0;
@@ -119,7 +99,7 @@ $$("s")  : document.querySelectorAll("s")
 			}
 		}
 	}
-	function s_object(o : haxe.DynamicAccess<Dynamic>, rec : Bool) {
+	function s_object( o : haxe.DynamicAccess<Dynamic>, rec : Bool ) {
 		if (!rec)
 			return PUSH(objLabel(o));
 		var keys = o.keys();
@@ -152,12 +132,12 @@ $$("s")  : document.querySelectorAll("s")
 	inline function clearPrev() prev = null;
 
 	function simple() {
-		if (lines[0] != prev || output.firstChild == null) {
+		if (lines[0] != prev || ui.output.firstChild == null) {
 			prev = lines[0];
 			prevCount = 1;
 			return HXX(<li>{{prev}}</li>);
 		}
-		var last = output.lastChild;
+		var last = ui.output.lastChild;
 		++ prevCount;
 		if (last.nodeType == TElement) { //
 			var conter = (cast last).querySelector(".ct");
@@ -172,7 +152,7 @@ $$("s")  : document.querySelectorAll("s")
 		return null;
 	}
 
-	function multiple(expr : String) {
+	function multiple( expr : String ) {
 		clearPrev();
 		return HXX(<li>
 			<a>{{ expr }}</a>
@@ -180,11 +160,11 @@ $$("s")  : document.querySelectorAll("s")
 		</li>);
 	}
 
-	function logInner(expr : String, v : Dynamic) {
+	function logInner( expr : String, v : Dynamic ) {
 		this.lines = [];
 		parse(v, true);
 		// collapse
-		var li : DOMElement = cast output.lastChild;
+		var li : DOMElement = cast ui.output.lastChild;
 		if (li != null && li.nodeName == "LI") {
 			var a = li.firstChild;
 			if (a != null && a.nodeName == "A" && (cast a).style.textDecoration != "underline")
@@ -193,21 +173,21 @@ $$("s")  : document.querySelectorAll("s")
 		return this.isSingle() ? simple() : multiple(expr);
 	}
 
-	static function attach(obj: js.html.EventTarget, type: String, handler : haxe.Constraints.Function) {
+	static function attach( obj : js.html.EventTarget, type : String, handler : haxe.Constraints.Function ) {
 		if (obj.addEventListener != null)
 			obj.addEventListener(type, handler);
 		else
 			(cast obj).attachEvent("on" + type, handler);
 	}
 
-	static function detach(obj: js.html.EventTarget, type: String, handler : haxe.Constraints.Function) {
+	static function detach( obj : js.html.EventTarget, type : String, handler : haxe.Constraints.Function ) {
 		if (obj.addEventListener != null)
 			obj.removeEventListener(type, handler);
 		else
 			(cast obj).detachEvent("on" + type, handler);
 	}
 
-	static function onShiftF12(e: js.html.KeyboardEvent) {
+	static function onShiftF12( e : js.html.KeyboardEvent ) {
 		if (e.shiftKey && e.keyCode == js.html.KeyEvent.DOM_VK_F12) {
 			mlog.toggle();
 			e.preventDefault();
@@ -215,44 +195,40 @@ $$("s")  : document.querySelectorAll("s")
 		}
 	}
 
-	static function toggleBlock(a : DOMElement){
+	static function toggleBlock( a : DOMElement ) {
 		var ul:Dynamic = a.nextSibling;
 		while (ul.nodeType != TElement)
 			ul = ul.nextSibling;
 		// IE8 doesn't support the changes on css sibling(e.g: a.hidden + ul {display:none} ).
-		if (ul.style.display == "none") {
-			ul.style.display = "block";
-			a.style.textDecoration = "none";
+		if (display(ul) == CSS_NONE) {
+			display(ul)= CSS_BLOCK;
+			a.style.textDecoration = CSS_NONE;
 		} else {
-			ul.style.display = "none";
+			display(ul) = CSS_NONE;
 			a.style.textDecoration = "underline";
 		}
 	}
 
-	static function onLinkClick(e : js.html.MouseEvent){
+	static function onClick( e : js.html.MouseEvent ) {
 		e.stopPropagation();
 		var a : DOMElement = cast e.target;
-		if (a.nodeName == "A")
-			toggleBlock(a);
+		if (a.tagName != "A")
+			return;
+		var ui = mlog.ui;
+		switch(text(a)) {
+		case "x": display(ui) = CSS_NONE;
+		case "c": mlog.clearOutput();
+		case "r": window.location.reload();
+		default: toggleBlock(a);
+		}
 	}
 
-	static function onClose( e : js.html.MouseEvent ) {
-		var a : DOMElement = cast e.target;
-		a.parentElement.style.display = "none";
-		e.stopPropagation();
-	}
-
-	static function onClear( e : js.html.MouseEvent ) {
-		e.stopPropagation();
-		mlog.clearOutput();
-	}
-
-	static function onInputKeydown(e: js.html.KeyboardEvent) {
+	static function onInputKeydown( e : js.html.KeyboardEvent ) {
 		if (!e.shiftKey) // bubbling to document for shift + F12
 			e.stopPropagation();
 		if (e.keyCode != js.html.KeyEvent.DOM_VK_RETURN)
 			return;
-		var value = mlog.input.value;
+		var value = mlog.ui.input.value;
 		try {
 			var result = js.Syntax.code("(new Function('return ' + {0}))()", value);
 			var li = mlog.logInner(value, result);
@@ -270,7 +246,7 @@ $$("s")  : document.querySelectorAll("s")
 		}
 	}
 
-	static function objLabel(o : Dynamic) : String {
+	static function objLabel( o : Dynamic ) : String {
 		if (o == null)
 			return (cast String)(o);
 		var ctor = o.constructor;
@@ -284,7 +260,7 @@ $$("s")  : document.querySelectorAll("s")
 		return "[" + "object" +"]";
 	}
 
-	static function log(v:Dynamic, ?infos:haxe.PosInfos) {
+	static function log( v : Dynamic, ?infos : haxe.PosInfos ) {
 		var label = objLabel(v);
 		if (infos == null) {
 			var node = mlog.logInner(label, v);
@@ -309,7 +285,7 @@ $$("s")  : document.querySelectorAll("s")
 		one("head").appendChild( HXX(<style type="text/css">{{css}}</style>) );
 	}
 
-	static inline function one(s : String) return document.querySelector(s);
+	static inline function one( s : String ) return document.querySelector(s);
 
 	@:keep static var mlog : MLog;
 
@@ -323,4 +299,26 @@ $$("s")  : document.querySelectorAll("s")
 extern enum abstract NodeType(Int) to Int {
 	var TElement = 1;
 	var TText    = 3;
+}
+
+#if !macro
+@:build(Nvd.buildString(
+	<div id="mlog">
+		<a title="close">x</a>
+		<a title="clear output">c</a>
+		<a title="refresh">r</a>
+		<input type="text">
+		<div></div>
+	</div>
+, {
+
+	close    :   $("a:contains('x')"),
+	clear    :   $("a:contains('c')"),
+	refresh  :   $("a:contains('r')"),
+	input    :   $("input"),
+	output   :   $("div"),
+
+}))
+#end
+abstract Ui(nvd.Comp) {
 }

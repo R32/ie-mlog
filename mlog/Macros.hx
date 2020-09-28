@@ -14,6 +14,7 @@ typedef CData = {
 #end
 
 class Macros {
+
 #if macro
 	@:persistent static var data : CData = {css: null, ver: null};
 
@@ -72,4 +73,7 @@ class Macros {
 		}
 		return macro $v{data.ver};
 	}
+
+	macro static public function display(node) return macro ($node : js.html.DOMElement).style.display;
+	macro static public function text(node) return macro ($node : js.html.DOMElement).innerText;
 }

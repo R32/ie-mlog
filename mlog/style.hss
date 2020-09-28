@@ -1,13 +1,15 @@
 #mlog {
-	var text-blue = #0366d6;
-	var background-color = #efefef;
-	var font-color = #2f363d;
-	var font-size = 16px;
-	var font-size-small = int($font-size * .75);
-	var mono-font = consolas, monospace;
-	var font-text = Arial, sans-serif;
-	var label-font = "Microsoft YaHei"; /* "Segoe UI" */
-	var pad4 = int($font-size * 0.25);
+
+var text-blue        = #0366d6;
+var background-color = #efefef;
+var font-color       = #2f363d;
+var font-size        = 16px;
+var font-size-small  = $font-size * .75;
+var mono-font        = consolas, monospace;
+var font-text        = Arial, sans-serif;
+var label-font       = "Microsoft YaHei"; /* "Segoe UI" */
+var pad4             = $font-size * 0.25;
+
 	position: fixed;
 	display: none;
 	left: 10%;
@@ -18,26 +20,32 @@
 	color: $font-color;
 	z-index: 10;
 	> a {
+		var height = $font-size * 1.25;
 		position: absolute;
 		display: block;
 		box-sizing: border-box;
-		width: $font-size * 1.2;
-		height: $font-size * 1.2;
+		width: $height;
+		height: $height;
+		line-height: 1;
 		color: #666;
 		cursor: pointer;
 		background-color: transparent;
 		border: 1px solid #999999;
-		line-height: 1;
 		font-family: $mono-font;
 		font-size: $font-size;
 		text-align: center;
 		&:first-child {
-			top: $font-size * -1.2;
+			top: -$height;
 			right: -1px;
 		}
+		var top = $pad4 * 2 + $font-size + 5;
 		&[title^=clear] {
-			top: $pad4 * 2 + $font-size + 5; // padding + fontSize + borderWidth
-			left: $font-size * -1.2;
+			top: $top; // padding + fontSize + borderWidth
+			left: -$height;
+		}
+		&[title=refresh] {
+			top: -$height;
+			right: $height - 2;
 		}
 	}
 	> input[type=text] {
@@ -48,6 +56,10 @@
 		font-family: $font-text;
 		color: inherit;
 		font-size: $font-size;
+		outline: 0;
+		&::-ms-clear{
+			display: none;
+		}
 	}
 	> div {
 		height: $font-size * 12;
