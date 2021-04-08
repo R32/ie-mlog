@@ -55,7 +55,7 @@ class MLog {
 	function usage() {
 		this.clearOutput();
 		var pre = HXX( <pre/> );
-		text(pre) = 'Mini log[ver:{{Macros.gitVersion()}}] for IWebBrowser(Embeded IE)
+		text(pre) = 'Mini log[ver:${Macros.gitVersion()}] for IWebBrowser(Embeded IE)
 cls      : clear output
 $("s")   : document.querySelector("s")
 $$("s")  : document.querySelectorAll("s")
@@ -259,6 +259,10 @@ $$("s")  : document.querySelectorAll("s")
 		return "[" + "object" +"]";
 	}
 
+	@:keep static public function show() {
+		display(mlog.ui) = CSS_BLOCK;
+	}
+
 	@:keep static function log( v : Dynamic, ?infos : haxe.PosInfos ) {
 		var label = objLabel(v);
 		if (infos == null) {
@@ -312,9 +316,9 @@ extern enum abstract NodeType(Int) to Int {
 	</div>
 , {
 
-	close    :   $("a:contains('x')"),
-	clear    :   $("a:contains('c')"),
-	refresh  :   $("a:contains('r')"),
+	close    :   $("a[title=close]"),
+	clear    :   $("a[title~=clear]"),
+	refresh  :   $("a[title=refresh]"),
 	input    :   $("input"),
 	output   :   $("div"),
 
