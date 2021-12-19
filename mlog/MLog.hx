@@ -144,7 +144,7 @@ $$("s")  : document.querySelectorAll("s")
 				conter = HXX(<span class="ct"></span>);
 				last.appendChild(conter);
 			}
-			conter.textContent = "" + prevCount;
+			text(conter) = "" + prevCount;
 		} else if (last.nodeType == TText) {
 			last.nodeValue = prev + "  " + "(" + prevCount + ")";
 		}
