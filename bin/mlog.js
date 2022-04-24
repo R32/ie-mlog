@@ -8,12 +8,14 @@ if (window.console == null) {
 			var slice = Array.prototype.slice;
 			var args = slice.call(arguments, 0);
 			var pinfo = null;
-			var p = args[0].split(":");
-			if (p.length >= 3) {
-				args = slice.call(args, 1);
-				if (args.length == 0)
-					args = [slice.call(p, 2).join(":")];
-				pinfo = {fileName: p[0], lineNumber: p[1] | 0};
+			if (typeof(args[0]) == "string") {
+				var p = args[0].split(":");
+				if (p.length >= 3) {
+					args = slice.call(args, 1);
+					if (args.length == 0)
+						args = [slice.call(p, 2).join(":")];
+					pinfo = {fileName: p[0], lineNumber: p[1] | 0};
+				}
 			}
 			MLog.log(args.length == 1 ? args[0] : args, pinfo);
 		}
@@ -231,21 +233,25 @@ MLog.log = function(v,infos) {
 		}
 		var node = MLog.mlog.logInner(label,v);
 		if(node != null) {
-			node.appendChild(__h("span",{ 'class' : "pos"},infos.fileName + ":" + infos.lineNumber));
+			var node1 = document.createElement("span");
+			node1.className = "pos";
+			node1.innerText = infos.fileName + ":" + infos.lineNumber;
+			node.appendChild(node1);
 			MLog.mlog.ui.children[4].appendChild(node);
 		}
 	}
 };
 MLog.injectCSS = function() {
-	var css = "#mlog{position:fixed;display:none;left:10%;right:10%;bottom:0;min-width:600px;border:#999999 1px solid;color:#2f363d;z-index:10;}#mlog>a{position:absolute;display:block;box-sizing:border-box;width:20px;height:20px;line-height:1;color:#666;cursor:pointer;background-color:transparent;border:1px solid #999999;font-family:consolas,monospace;font-size:16px;text-align:center;}#mlog>a:first-child{top:-20px;right:-1px;}#mlog>a[title^=clear]{top:29px;left:-20px;}#mlog>a[title=refresh]{top:-20px;right:18px;}#mlog>input[type=text]{display:block;width:100%;box-sizing:border-box;padding:4px 0;font-family:Arial,sans-serif;color:inherit;font-size:16px;outline:0;}#mlog>input[type=text]::-ms-clear{display:none;}#mlog>div{height:192px;font-family:consolas,monospace;background-color:#efefef;white-space:pre;overflow-y:auto;font-size:14px;list-style:none;}#mlog>div>pre{margin:0;font-family:consolas,monospace;color:#0366d6;}#mlog>div>li{margin:0;padding:0;border:1px #efefef solid;}#mlog>div>li pre{margin:0;padding-left:20px;}#mlog>div>li a{cursor:pointer;color:#0366d6;text-decoration:none;}#mlog>div>li.err{color:#f00;background-color:#ffeded;border-top-color:#da9393;border-bottom-color:#da9393;}#mlog>div span.ct{vertical-align:top;padding:1px 4px;margin-left:2px;background-color:#998fc7;color:#fff;font-size:12px;}#mlog>div span.pos{color:#666;float:right;text-align:right;padding:1px 2px 0 0;font-size:12px;}";
 	var tmp = window.document.querySelector("head");
-	var n = __h("style",{ type : "text/css"});
-	if(n.styleSheet) {
-		n.styleSheet.cssText = css;
+	var _css = "#mlog{position:fixed;display:none;left:10%;right:10%;bottom:0;min-width:600px;border:#999999 1px solid;color:#2f363d;z-index:10;}#mlog>a{position:absolute;display:block;box-sizing:border-box;width:20px;height:20px;line-height:1;color:#666;cursor:pointer;background-color:transparent;border:1px solid #999999;font-family:consolas,monospace;font-size:16px;text-align:center;}#mlog>a:first-child{top:-20px;right:-1px;}#mlog>a[title^=clear]{top:29px;left:-20px;}#mlog>a[title=refresh]{top:-20px;right:18px;}#mlog>input[type=text]{display:block;width:100%;box-sizing:border-box;padding:4px 0;font-family:Arial,sans-serif;color:inherit;font-size:16px;outline:0;}#mlog>input[type=text]::-ms-clear{display:none;}#mlog>div{height:192px;font-family:consolas,monospace;background-color:#efefef;white-space:pre;overflow-y:auto;font-size:14px;list-style:none;}#mlog>div>pre{margin:0;font-family:consolas,monospace;color:#0366d6;}#mlog>div>li{margin:0;padding:0;border:1px #efefef solid;}#mlog>div>li pre{margin:0;padding-left:20px;}#mlog>div>li a{cursor:pointer;color:#0366d6;text-decoration:none;}#mlog>div>li.err{color:#f00;background-color:#ffeded;border-top-color:#da9393;border-bottom-color:#da9393;}#mlog>div span.ct{vertical-align:top;padding:1px 4px;margin-left:2px;background-color:#998fc7;color:#fff;font-size:12px;}#mlog>div span.pos{color:#666;float:right;text-align:right;padding:1px 2px 0 0;font-size:12px;}";
+	var _style = document.createElement("style");
+	_style.setAttribute("type","text/css");
+	if(_style.styleSheet) {
+		_style.styleSheet.cssText = _css;
 	} else {
-		n.textContent = css;
+		_style.textContent = _css;
 	}
-	tmp.appendChild(n);
+	tmp.appendChild(_style);
 };
 MLog.main = function() {
 	MLog.injectCSS();
@@ -273,7 +279,7 @@ MLog.prototype = {
 	,usage: function() {
 		this.clearOutput();
 		var pre = document.createElement("pre");
-		pre.innerText = "Mini log[ver:" + "master fc06bf1" + "] for IWebBrowser(Embeded IE)\r\ncls      : clear output\r\n$(\"s\")   : document.querySelector(\"s\")\r\n$" + "(\"s\")  : document.querySelectorAll(\"s\")\r\n";
+		pre.innerText = "Mini log[ver:" + "master eba094b" + "] for IWebBrowser(Embeded IE)\r\ncls      : clear output\r\n$(\"s\")   : document.querySelector(\"s\")\r\n$" + "(\"s\")  : document.querySelectorAll(\"s\")\r\n";
 		this.ui.children[4].appendChild(pre);
 	}
 	,parse: function(v,first) {
@@ -384,8 +390,10 @@ MLog.prototype = {
 		if(last.nodeType == 1) {
 			var conter = last.querySelector(".ct");
 			if(conter == null) {
-				conter = __h("span",{ 'class' : "ct"});
-				last.appendChild(conter);
+				var node = document.createElement("span");
+				node.className = "ct";
+				conter = node;
+				last.appendChild(node);
 			}
 			conter.innerText = "" + this.prevCount;
 		} else if(last.nodeType == 3) {
@@ -419,12 +427,13 @@ function __h(name,attr,sub) {
 	if(attr != null) {
 		for(var k in attr) dom.setAttribute(k, attr[k]);
 	}
-	if(sub) {
-		__hrec(dom,sub,false);
-	}
+	__hrec(dom,sub,false);
 	return dom;
 }
 function __hrec(box,sub,loop) {
+	if(sub == null) {
+		return;
+	}
 	if(((sub) instanceof Array)) {
 		var i = 0;
 		var len = sub.length;
