@@ -2,8 +2,6 @@ package mlog;
 
 import Nvd.HXX;
 import js.html.DOMElement;
-import js.Browser.window;
-import js.Browser.document;
 import mlog.Macros.display;
 import mlog.Macros.text;
 
@@ -282,6 +280,16 @@ $$("s")  : document.querySelectorAll("s")
 		}
 	}
 
+	static function error( msg : String, ?infos : haxe.PosInfos ) {
+		mlog.lines = [msg];
+		var node = mlog.simple();
+		if (node != null) {
+			node.style.color = "red";
+			node.appendChild(HXX(<span class="pos">{{ infos.fileName }}:{{ infos.lineNumber }}</span>));
+			mlog.OUT(node);
+		}
+	}
+
 	// don't do inline here since https://github.com/HaxeFoundation/haxe/issues/6197
 	@:analyzer(no_const_propagation) static function injectCSS() {
 		var css = Macros.buildHSS("mlog/style.hss");
@@ -296,9 +304,30 @@ $$("s")  : document.querySelectorAll("s")
 		injectCSS();
 		mlog = new MLog();
 		mlog.render();
-		js.Syntax.code("window.MLog = {0}",MLog);
+		js.Syntax.code("window.MLog = {0}", MLog);
+		if (navigator.userAgent.indexOf("MSIE") == -1)
+			return;
+		(window : Dynamic).onerror = function( msg : String, url : String, line : Int ) {
+			var ptr = url.lastIndexOf("/");
+			if (ptr == -1) {
+				ptr = url.lastIndexOf("\\");
+			}
+			if (ptr != -1)
+				url = url.substring(ptr + 1);
+			MLog.error("[" + msg + "]", {
+				fileName   : url,
+				lineNumber : line,
+				className  : "",
+				methodName : "",
+			});
+			(window.event : Dynamic).returnValue = true;
+		}
 	}
 }
+
+@:native("document") extern var document : js.html.Document;
+@:native("window") extern var window : js.html.Window;
+@:native("navigator") extern var navigator : js.html.Navigator;
 
 extern enum abstract NodeType(Int) to Int {
 	var TElement = 1;
