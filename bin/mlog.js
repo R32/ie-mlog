@@ -241,8 +241,20 @@ MLog.log = function(v,infos) {
 		}
 	}
 };
+MLog.error = function(msg,infos) {
+	MLog.mlog.lines = [msg];
+	var node = MLog.mlog.simple();
+	if(node != null) {
+		node.style.color = "red";
+		var node1 = document.createElement("span");
+		node1.className = "pos";
+		node1.innerText = infos.fileName + ":" + infos.lineNumber;
+		node.appendChild(node1);
+		MLog.mlog.ui.children[4].appendChild(node);
+	}
+};
 MLog.injectCSS = function() {
-	var tmp = window.document.querySelector("head");
+	var tmp = document.querySelector("head");
 	var _css = "#mlog{position:fixed;display:none;left:10%;right:10%;bottom:0;min-width:600px;border:#999999 1px solid;color:#2f363d;z-index:10;}#mlog>a{position:absolute;display:block;box-sizing:border-box;width:20px;height:20px;line-height:1;color:#666;cursor:pointer;background-color:transparent;border:1px solid #999999;font-family:consolas,monospace;font-size:16px;text-align:center;}#mlog>a:first-child{top:-20px;right:-1px;}#mlog>a[title^=clear]{top:29px;left:-20px;}#mlog>a[title=refresh]{top:-20px;right:18px;}#mlog>input[type=text]{display:block;width:100%;box-sizing:border-box;padding:4px 0;font-family:Arial,sans-serif;color:inherit;font-size:16px;outline:0;}#mlog>input[type=text]::-ms-clear{display:none;}#mlog>div{height:192px;font-family:consolas,monospace;background-color:#efefef;white-space:pre;overflow-y:auto;font-size:14px;list-style:none;}#mlog>div>pre{margin:0;font-family:consolas,monospace;color:#0366d6;}#mlog>div>li{margin:0;padding:0;border:1px #efefef solid;}#mlog>div>li pre{margin:0;padding-left:20px;}#mlog>div>li a{cursor:pointer;color:#0366d6;text-decoration:none;}#mlog>div>li.err{color:#f00;background-color:#ffeded;border-top-color:#da9393;border-bottom-color:#da9393;}#mlog>div span.ct{vertical-align:top;padding:1px 4px;margin-left:2px;background-color:#998fc7;color:#fff;font-size:12px;}#mlog>div span.pos{color:#666;float:right;text-align:right;padding:1px 2px 0 0;font-size:12px;}";
 	var _style = document.createElement("style");
 	_style.setAttribute("type","text/css");
@@ -258,12 +270,26 @@ MLog.main = function() {
 	MLog.mlog = new MLog();
 	MLog.mlog.render();
 	window.MLog = MLog;
+	if(navigator.userAgent.indexOf("MSIE") == -1) {
+		return;
+	}
+	window.onerror = function(msg,url,line) {
+		var ptr = url.lastIndexOf("/");
+		if(ptr == -1) {
+			ptr = url.lastIndexOf("\\");
+		}
+		if(ptr != -1) {
+			url = url.substring(ptr + 1);
+		}
+		MLog.error("[" + msg + "]",{ fileName : url, lineNumber : line, className : "", methodName : ""});
+		window.event.returnValue = true;
+	};
 };
 MLog.prototype = {
 	render: function() {
 		this.ui.style.display = "none";
-		window.document.body.appendChild(this.ui);
-		MLog.attach(window.document.documentElement,"keydown",MLog.onShiftF12);
+		document.body.appendChild(this.ui);
+		MLog.attach(document.documentElement,"keydown",MLog.onShiftF12);
 		MLog.attach(this.ui.children[3],"keydown",MLog.onInputKeydown);
 		MLog.attach(this.ui,"click",MLog.onClick);
 		
@@ -279,7 +305,7 @@ MLog.prototype = {
 	,usage: function() {
 		this.clearOutput();
 		var pre = document.createElement("pre");
-		pre.innerText = "Mini log[ver:" + "master eba094b" + "] for IWebBrowser(Embeded IE)\r\ncls      : clear output\r\n$(\"s\")   : document.querySelector(\"s\")\r\n$" + "(\"s\")  : document.querySelectorAll(\"s\")\r\n";
+		pre.innerText = "Mini log[ver:" + "master 08ac6e3" + "] for IWebBrowser(Embeded IE)\r\ncls      : clear output\r\n$(\"s\")   : document.querySelector(\"s\")\r\n$" + "(\"s\")  : document.querySelectorAll(\"s\")\r\n";
 		this.ui.children[4].appendChild(pre);
 	}
 	,parse: function(v,first) {
