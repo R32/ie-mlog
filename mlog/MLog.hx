@@ -237,7 +237,7 @@ $$("s")  : document.querySelectorAll("s")
 			} else if (value == "cls") {
 				mlog.clearOutput();
 			} else {
-				return mlog.OUT(HXX(<li class="err">{{e}}</li>));
+				return mlog.OUT(HXX(<li class="err">{{ e + "" }}</li>));
 			}
 			mlog.clearInput();
 		}
@@ -284,7 +284,7 @@ $$("s")  : document.querySelectorAll("s")
 		mlog.lines = [msg];
 		var node = mlog.simple();
 		if (node != null) {
-			node.style.color = "red";
+			node.className = "err";
 			node.appendChild(HXX(<span class="pos">{{ infos.fileName }}:{{ infos.lineNumber }}</span>));
 			mlog.OUT(node);
 		}
