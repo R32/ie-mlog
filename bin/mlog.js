@@ -193,7 +193,10 @@ MLog.onInputKeydown = function(e) {
 		} else if(value == "cls") {
 			MLog.mlog.clearOutput();
 		} else {
-			MLog.mlog.ui.children[4].appendChild(__h("li",{ 'class' : "err"},_g1));
+			var node = document.createElement("li");
+			node.className = "err";
+			node.innerText = Std.string(_g1) + "";
+			MLog.mlog.ui.children[4].appendChild(node);
 			return;
 		}
 		MLog.mlog.ui.children[3].value = "";
@@ -245,7 +248,7 @@ MLog.error = function(msg,infos) {
 	MLog.mlog.lines = [msg];
 	var node = MLog.mlog.simple();
 	if(node != null) {
-		node.style.color = "red";
+		node.className = "err";
 		var node1 = document.createElement("span");
 		node1.className = "pos";
 		node1.innerText = infos.fileName + ":" + infos.lineNumber;
@@ -305,7 +308,7 @@ MLog.prototype = {
 	,usage: function() {
 		this.clearOutput();
 		var pre = document.createElement("pre");
-		pre.innerText = "Mini log[ver:" + "master 08ac6e3" + "] for IWebBrowser(Embeded IE)\r\ncls      : clear output\r\n$(\"s\")   : document.querySelector(\"s\")\r\n$" + "(\"s\")  : document.querySelectorAll(\"s\")\r\n";
+		pre.innerText = "Mini log[ver:" + "master d357b6d" + "] for IWebBrowser(Embeded IE)\r\ncls      : clear output\r\n$(\"s\")   : document.querySelector(\"s\")\r\n$" + "(\"s\")  : document.querySelectorAll(\"s\")\r\n";
 		this.ui.children[4].appendChild(pre);
 	}
 	,parse: function(v,first) {
