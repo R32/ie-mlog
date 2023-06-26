@@ -1,6 +1,4 @@
-/*!
- for haxe
-*/
+//! for haxe
 if (window.console == null) {
 	window.console = {
 		log: function() {
@@ -20,38 +18,34 @@ if (window.console == null) {
 		}
 	}
 }
-/*!
-Event.prototype.target, preventDefault, stopPropagation.(no currentTarget)
-*/
-if (Object.defineProperty
-  && Object.getOwnPropertyDescriptor
-  && Object.getOwnPropertyDescriptor(Event.prototype, "target")
-  && !Object.getOwnPropertyDescriptor(Event.prototype, "target").get) {
-  (function(){
-    var target = Object.getOwnPropertyDescriptor(Event.prototype, "srcElement");
-    Object.defineProperty(Event.prototype, "target",
-     {
-       get: function() {
-         return target.get.call(this);
-       }
-     }
-    )
-  })();
-  (function(){
-    if (!Event.prototype.preventDefault) {
-      Event.prototype.preventDefault=function() {
-        this.returnValue=false;
-      };
-    }
-    if (!Event.prototype.stopPropagation) {
-      Event.prototype.stopPropagation=function() {
-        this.cancelBubble=true;
-      };
-    }
-  })();
-}
-
-/*! Date.now */
-if (!Date.now) {
-	Date.now = function now() { return new Date().getTime(); };
+//! reverse polyfill : srcElement, cancelBubble, returnValue
+if (typeof(Event) == "object" && Object.defineProperty) {
+	var proto = Event.prototype;
+	var tar = Object.getOwnPropertyDescriptor(proto, "srcElement");
+	if (!(tar && tar.get)) {
+		//console.log("srcElement");
+		Object.defineProperty(proto, "srcElement", {
+			get : function() {
+				return this.target
+			}
+		})
+	}
+	var bubble = Object.getOwnPropertyDescriptor(proto, "cancelBubble")
+	if (proto.stopPropagation && !(bubble && bubble.set)) {
+		//console.log("cancelBubble");
+		Object.defineProperty(proto, "cancelBubble", {
+			set : function(_) {
+				this.stopPropagation();
+			},
+		})
+	}
+	var halt = Object.getOwnPropertyDescriptor(proto, "returnValue")
+	if (proto.preventDefault && !(halt && halt.set)) {
+		//console.log("returnValue");
+		Object.defineProperty(proto, "returnValue", {
+			set : function(_) {
+				this.preventDefault();
+			},
+		})
+	}
 }

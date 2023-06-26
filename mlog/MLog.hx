@@ -5,9 +5,9 @@ import js.html.DOMElement;
 import mlog.Macros.display;
 import mlog.Macros.text;
 
-/**
- Press "shift + F12" to lanuch.
-*/
+/*
+ * Press "shift + F12" to lanuch.
+ */
 @:native("MLog")
 class MLog {
 
@@ -55,8 +55,8 @@ class MLog {
 		var pre = HXX( <pre/> );
 		text(pre) = 'Mini log[ver:${Macros.gitVersion()}] for IWebBrowser(Embeded IE)
 cls      : clear output
-$("s")   : document.querySelector("s")
-$$("s")  : document.querySelectorAll("s")
+$$("s")   : document.querySelector("s")
+$$$$("s")  : document.querySelectorAll("s")
 ';
 		OUT(pre);
 	}
@@ -187,8 +187,8 @@ $$("s")  : document.querySelectorAll("s")
 	static function onShiftF12( e : js.html.KeyboardEvent ) {
 		if (e.shiftKey && e.keyCode == js.html.KeyEvent.DOM_VK_F12) {
 			mlog.toggle();
-			e.preventDefault();
-			e.stopPropagation();
+			e.cancelBubble = true;
+			e.returnValue = false;
 		}
 	}
 
@@ -207,8 +207,8 @@ $$("s")  : document.querySelectorAll("s")
 	}
 
 	static function onClick( e : js.html.MouseEvent ) {
-		e.stopPropagation();
-		var a : DOMElement = cast e.target;
+		e.cancelBubble = true;
+		var a : DOMElement = (e : Dynamic).srcElement;
 		if (a.tagName != "A")
 			return;
 		var ui = mlog.ui;
@@ -222,7 +222,7 @@ $$("s")  : document.querySelectorAll("s")
 
 	static function onInputKeydown( e : js.html.KeyboardEvent ) {
 		if (!e.shiftKey) // bubbling to document for shift + F12
-			e.stopPropagation();
+			e.cancelBubble = true;
 		if (e.keyCode != js.html.KeyEvent.DOM_VK_RETURN)
 			return;
 		var value = mlog.ui.input.value;
