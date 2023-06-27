@@ -187,8 +187,8 @@ $$$$("s")  : document.querySelectorAll("s")
 	static function onShiftF12( e : js.html.KeyboardEvent ) {
 		if (e.shiftKey && e.keyCode == js.html.KeyEvent.DOM_VK_F12) {
 			mlog.toggle();
-			e.cancelBubble = true;
-			e.returnValue = false;
+			e.stopPropagation();
+			e.preventDefault();
 		}
 	}
 
@@ -207,8 +207,8 @@ $$$$("s")  : document.querySelectorAll("s")
 	}
 
 	static function onClick( e : js.html.MouseEvent ) {
-		e.cancelBubble = true;
-		var a : DOMElement = (e : Dynamic).srcElement;
+		e.stopPropagation();
+		var a : DOMElement = cast e.target;
 		if (a.tagName != "A")
 			return;
 		var ui = mlog.ui;
@@ -222,7 +222,7 @@ $$$$("s")  : document.querySelectorAll("s")
 
 	static function onInputKeydown( e : js.html.KeyboardEvent ) {
 		if (!e.shiftKey) // bubbling to document for shift + F12
-			e.cancelBubble = true;
+			e.stopPropagation();
 		if (e.keyCode != js.html.KeyEvent.DOM_VK_RETURN)
 			return;
 		var value = mlog.ui.input.value;
@@ -320,7 +320,7 @@ $$$$("s")  : document.querySelectorAll("s")
 				className  : "",
 				methodName : "",
 			});
-			(window.event : Dynamic).returnValue = true;
+			window.event.preventDefault();
 		}
 	}
 }

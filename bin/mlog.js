@@ -19,36 +19,28 @@ if (window.console == null) {
 		}
 	}
 }
-//! reverse polyfill : srcElement, cancelBubble, returnValue
+//! polyfill : target, stopPropagation, preventDefault
 if (typeof(Event) == "object" && Object.defineProperty) {
 	var proto = Event.prototype;
-	var tar = Object.getOwnPropertyDescriptor(proto, "srcElement");
+	var tar = Object.getOwnPropertyDescriptor(proto, "target");
 	if (!(tar && tar.get)) {
-		//console.log("srcElement");
-		Object.defineProperty(proto, "srcElement", {
+		Object.defineProperty(proto, "target", {
 			get : function() {
-				return this.target
+				return this.srcElement
 			}
 		})
 	}
-	var bubble = Object.getOwnPropertyDescriptor(proto, "cancelBubble")
-	if (proto.stopPropagation && !(bubble && bubble.set)) {
-		//console.log("cancelBubble");
-		Object.defineProperty(proto, "cancelBubble", {
-			set : function(_) {
-				this.stopPropagation();
-			},
-		})
+	if (!proto.stopPropagation) {
+		proto.stopPropagation = function() {
+			this.cancelBubble = true;
+		}
 	}
-	var halt = Object.getOwnPropertyDescriptor(proto, "returnValue")
-	if (proto.preventDefault && !(halt && halt.set)) {
-		//console.log("returnValue");
-		Object.defineProperty(proto, "returnValue", {
-			set : function(_) {
-				this.preventDefault();
-			},
-		})
+	if (!proto.preventDefault) {
+		proto.preventDefault = function() {
+			this.returnValue = false;
+		}
 	}
+	proto = tar = null;
 }
 
 ;(function (console, $global) { "use strict";
@@ -130,8 +122,8 @@ MLog.onShiftF12 = function(e) {
 	if(e.shiftKey && e.keyCode == 123) {
 		var _this = MLog.mlog;
 		_this.ui.style.display = _this.ui.style.display == "none" ? "block" : "none";
-		e.cancelBubble = true;
-		e.returnValue = false;
+		e.stopPropagation();
+		e.preventDefault();
 	}
 };
 MLog.toggleBlock = function(a) {
@@ -146,8 +138,8 @@ MLog.toggleBlock = function(a) {
 	}
 };
 MLog.onClick = function(e) {
-	e.cancelBubble = true;
-	var a = e.srcElement;
+	e.stopPropagation();
+	var a = e.target;
 	if(a.tagName != "A") {
 		return;
 	}
@@ -168,7 +160,7 @@ MLog.onClick = function(e) {
 };
 MLog.onInputKeydown = function(e) {
 	if(!e.shiftKey) {
-		e.cancelBubble = true;
+		e.stopPropagation();
 	}
 	if(e.keyCode != 13) {
 		return;
@@ -281,7 +273,7 @@ MLog.main = function() {
 			url = url.substring(ptr + 1);
 		}
 		MLog.error("[" + msg + "]",{ fileName : url, lineNumber : line, className : "", methodName : ""});
-		window.event.returnValue = true;
+		window.event.preventDefault();
 	};
 };
 MLog.prototype = {
@@ -304,7 +296,7 @@ MLog.prototype = {
 	,usage: function() {
 		this.clearOutput();
 		var pre = document.createElement("pre");
-		pre.innerText = "Mini log[ver:" + "master 230cdec" + "] for IWebBrowser(Embeded IE)\r\ncls      : clear output\r\n$" + "(\"s\")   : document.querySelector(\"s\")\r\n$" + "$" + "(\"s\")  : document.querySelectorAll(\"s\")\r\n";
+		pre.innerText = "Mini log[ver:" + "0.1.0" + "] for IWebBrowser(Embeded IE)\r\ncls      : clear output\r\n$" + "(\"s\")   : document.querySelector(\"s\")\r\n$" + "$" + "(\"s\")  : document.querySelectorAll(\"s\")\r\n";
 		this.ui.children[4].appendChild(pre);
 	}
 	,parse: function(v,first) {

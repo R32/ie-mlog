@@ -18,34 +18,26 @@ if (window.console == null) {
 		}
 	}
 }
-//! reverse polyfill : srcElement, cancelBubble, returnValue
+//! polyfill : target, stopPropagation, preventDefault
 if (typeof(Event) == "object" && Object.defineProperty) {
 	var proto = Event.prototype;
-	var tar = Object.getOwnPropertyDescriptor(proto, "srcElement");
+	var tar = Object.getOwnPropertyDescriptor(proto, "target");
 	if (!(tar && tar.get)) {
-		//console.log("srcElement");
-		Object.defineProperty(proto, "srcElement", {
+		Object.defineProperty(proto, "target", {
 			get : function() {
-				return this.target
+				return this.srcElement
 			}
 		})
 	}
-	var bubble = Object.getOwnPropertyDescriptor(proto, "cancelBubble")
-	if (proto.stopPropagation && !(bubble && bubble.set)) {
-		//console.log("cancelBubble");
-		Object.defineProperty(proto, "cancelBubble", {
-			set : function(_) {
-				this.stopPropagation();
-			},
-		})
+	if (!proto.stopPropagation) {
+		proto.stopPropagation = function() {
+			this.cancelBubble = true;
+		}
 	}
-	var halt = Object.getOwnPropertyDescriptor(proto, "returnValue")
-	if (proto.preventDefault && !(halt && halt.set)) {
-		//console.log("returnValue");
-		Object.defineProperty(proto, "returnValue", {
-			set : function(_) {
-				this.preventDefault();
-			},
-		})
+	if (!proto.preventDefault) {
+		proto.preventDefault = function() {
+			this.returnValue = false;
+		}
 	}
+	proto = tar = null;
 }
